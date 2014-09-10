@@ -14,24 +14,31 @@ type Post struct {
   Body []byte
 }
 
+type Content struct {
+  Title template.HTML
+  Body template.HTML
+}
+
 func (p *Post) save() error {
   filename := p.Title + ".md"
   return ioutil.WriteFile(filename, p.Body, 0600)
 }
 
-func loadPost(title string) (*Post, error) {
-  filename := title + ".txt"
+func loadPost(title string) (*Content, error) {
+  filename := title + ".md"
   body, err := ioutil.ReadFile(filename)
   if err != nil {
     return nil, err
   }
 
   htmlBody := blackfriday.MarkdownCommon(body)
-  return &Post{Title: title, Body: htmlBody}, nil
+  return &Content{Title: template.HTML(title), Body: template.HTML(htmlBody)}, nil
 }
 
+// TODO: better way to do this?  
 var templates = template.Must(template.ParseFiles(
-    "templates/admin.html", 
+    "templates/partials.html",
+    "templates/admin.html",
     "templates/view.html"))
 
 func main() {
@@ -43,9 +50,8 @@ func main() {
   http.ListenAndServe(":8080", nil)
 }
 
-
 /* HANDLERS */
-// List out all posts
+// TODO: List out all posts
 func adminHandler(writer http.ResponseWriter, request *http.Request) {
    renderTemplate(writer, "admin", nil)
 }
@@ -61,8 +67,8 @@ func viewHandler(writer http.ResponseWriter, request *http.Request) {
   renderTemplate(writer, "view", post)
 }
 
-func renderTemplate(w http.ResponseWriter, tmpl string, p *Post) {
-	err := templates.ExecuteTemplate(w, tmpl+".html", p)
+func renderTemplate(w http.ResponseWriter, tmpl string, c *Content) {
+	err := templates.ExecuteTemplate(w, tmpl+".html", c)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
