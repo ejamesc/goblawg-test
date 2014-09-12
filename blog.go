@@ -4,6 +4,7 @@ import (
 	"html/template"
 	"io/ioutil"
 	"net/http"
+  "strings"
 
 	"github.com/gorilla/mux"
 	"github.com/russross/blackfriday"
@@ -24,15 +25,39 @@ func (p *Post) save() error {
 	return ioutil.WriteFile(filename, p.Body, 0600)
 }
 
+func convertToFilename(urlPath string) string {
+  res := strings.Replace(urlPath, "-", "_", -1)
+  res = "content/" + res + ".md"
+  return res
+}
+
+func convertToDisplayTitle(urlPath string) string {
+  res := strings.Replace(urlPath, "-", " ", -1)
+  res = strings.Title(res)
+  return res
+}
+
+func saveHTML(title string, template string) error {
+  content, err := loadPost(title)
+  if err != nil {
+    return err
+  }
+
+  //w := 
+  //templates.ExecuteTemplate(w, template+".html", content)
+  return nil
+}
+
 func loadPost(title string) (*Content, error) {
-	filename := title + ".md"
+  filename := convertToFilename(title)
 	body, err := ioutil.ReadFile(filename)
 	if err != nil {
 		return nil, err
 	}
 
 	htmlBody := blackfriday.MarkdownCommon(body)
-	return &Content{Title: template.HTML(title), Body: template.HTML(htmlBody)}, nil
+  displayTitle := convertToDisplayTitle(title)
+	return &Content{Title: template.HTML(displayTitle), Body: template.HTML(htmlBody)}, nil
 }
 
 // TODO: better way to do this?
@@ -73,3 +98,4 @@ func renderTemplate(w http.ResponseWriter, tmpl string, c *Content) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
+
