@@ -5,6 +5,8 @@ import (
 	"io/ioutil"
 	"net/http"
   "strings"
+  "os"
+  "fmt"
 
 	"github.com/gorilla/mux"
 	"github.com/russross/blackfriday"
@@ -25,9 +27,16 @@ func (p *Post) save() error {
 	return ioutil.WriteFile(filename, p.Body, 0600)
 }
 
-func convertToFilename(urlPath string) string {
+func convertToMarkdownFilename(urlPath string) string {
   res := strings.Replace(urlPath, "-", "_", -1)
   res = "content/" + res + ".md"
+  return res
+}
+
+func convertToFilename(urlPath string) string {
+  res := strings.Replace(urlPath, "-", "_", -1)
+  res = strings.Replace(urlPath, " ", "_", -1)
+  res = res + ".html"
   return res
 }
 
@@ -43,13 +52,18 @@ func saveHTML(title string, template string) error {
     return err
   }
 
-  //w := 
-  //templates.ExecuteTemplate(w, template+".html", content)
+  filepath := convertToFilename(title)
+  w, werr := os.OpenFile(filepath, os.O_RDWR|os.O_CREATE, 0666)
+  if werr != nil {
+    return werr
+  }
+  defer w.Close()
+  templates.ExecuteTemplate(w, template+".html", content)
   return nil
 }
 
 func loadPost(title string) (*Content, error) {
-  filename := convertToFilename(title)
+  filename := convertToMarkdownFilename(title)
 	body, err := ioutil.ReadFile(filename)
 	if err != nil {
 		return nil, err
@@ -70,6 +84,7 @@ func main() {
 	r := mux.NewRouter()
 	r.HandleFunc("/admin/", adminHandler)
 	r.HandleFunc("/view/{title}", viewHandler)
+  r.HandleFunc("/save/{title}", saveHandler)
 
 	http.Handle("/", r)
 	http.ListenAndServe(":8080", nil)
@@ -90,6 +105,17 @@ func viewHandler(writer http.ResponseWriter, request *http.Request) {
 	}
 
 	renderTemplate(writer, "view", post)
+}
+
+func saveHandler(writer http.ResponseWriter, request *http.Request) {
+  vars := mux.Vars(request)
+  err := saveHTML(vars["title"], "view")
+  if err != nil {
+    http.Error(writer, err.Error(), http.StatusInternalServerError)
+    return
+  }
+
+  fmt.Fprint(writer, "Save complete!")
 }
 
 func renderTemplate(w http.ResponseWriter, tmpl string, c *Content) {
