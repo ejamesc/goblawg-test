@@ -12,6 +12,9 @@ import (
 	"github.com/russross/blackfriday"
 )
 
+/* 
+ * Structs
+ */
 type Post struct {
 	Title string
 	Body  []byte
@@ -27,6 +30,9 @@ func (p *Post) save() error {
 	return ioutil.WriteFile(filename, p.Body, 0600)
 }
 
+/*
+ * Utils
+ */
 func convertToMarkdownFilename(urlPath string) string {
   res := strings.Replace(urlPath, "-", "_", -1)
   res = "content/" + res + ".md"
@@ -74,12 +80,18 @@ func loadPost(title string) (*Content, error) {
 	return &Content{Title: template.HTML(displayTitle), Body: template.HTML(htmlBody)}, nil
 }
 
+/*
+ * Template Loading
+ */
 // TODO: better way to do this?
 var templates = template.Must(template.ParseFiles(
 	"templates/partials.html",
 	"templates/admin.html",
 	"templates/view.html"))
 
+/*
+ * Main Function
+ */
 func main() {
 	r := mux.NewRouter()
 	r.HandleFunc("/admin/", adminHandler)
@@ -90,8 +102,11 @@ func main() {
 	http.ListenAndServe(":8080", nil)
 }
 
-/* HANDLERS */
+/*
+ * Handlers
+ */
 // TODO: List out all posts
+
 func adminHandler(writer http.ResponseWriter, request *http.Request) {
 	renderTemplate(writer, "admin", nil)
 }
