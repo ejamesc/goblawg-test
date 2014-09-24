@@ -60,10 +60,11 @@ func saveHTML(title string, template string) error {
 
   filepath := convertToFilename(title)
   w, werr := os.OpenFile(filepath, os.O_RDWR|os.O_CREATE, 0666)
+  defer w.Close()
   if werr != nil {
     return werr
   }
-  defer w.Close()
+  
   templates.ExecuteTemplate(w, template+".html", content)
   return nil
 }
