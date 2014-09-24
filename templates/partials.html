@@ -2,12 +2,40 @@
 <head>
   <title>Elijames.org</title>
 </head>
+<link href='/static/css/foundation.min.css' media="all" rel="stylesheet" type='text/css' />
 <body>
 {{end}}
+
+{{define "adminheader"}}
+<head>
+  <title>Elijames.org - Admin</title>
+</head>
+<link href='/static/css/foundation.min.css' media="all" rel="stylesheet" type='text/css' />
+<!-- wysihtml5 parser rules -->
+<script src="/static/javascript/advanced.js"></script>
+<!-- Library -->
+<script src="/static/javascript/wysihtml5-0.3.0.min.js"></script>
+<body>
+{{end}}
+
 
 {{define "footer"}}
 <footer>
   &copy; Cedric Chin/Eli James, 2014
 </footer>
+</body>
+{{end}}
+
+{{define "adminfooter"}}
+<footer>
+  &copy; Cedric Chin/Eli James, 2014
+</footer>
+<script>
+var editor = new wysihtml5.Editor("wysihtml5-textarea", { // id of textarea element
+  toolbar:      "wysihtml5-toolbar", // id of toolbar element
+  parserRules:  wysihtml5ParserRules, // defined in parser rules set 
+  stylesheets: ["static/css/editor.css"]
+});
+</script>
 </body>
 {{end}}
