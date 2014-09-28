@@ -41,14 +41,6 @@ func convertToMarkdownFilename(urlPath string) string {
 	return res
 }
 
-func convertToFilename(urlPath string) string {
-	res := strings.Replace(urlPath, "-", "_", -1)
-	res = strings.Replace(res, " ", "_", -1)
-  res = strings.ToLower(res)
-	res = res + ".html"
-	return res
-}
-
 func convertToDisplayTitle(urlPath string) string {
 	res := strings.Replace(urlPath, "-", " ", -1)
 	res = strings.Replace(res, "_", " ", -1)
@@ -62,7 +54,11 @@ func saveHTML(title string, template string) error {
 		return err
 	}
 
-	filepath := convertToFilename(title)
+	filepath := strings.Replace(title, "-", "_", -1)
+	filepath = strings.Replace(filepath, " ", "_", -1)
+	filepath = strings.ToLower(filepath)
+	filepath = filepath + ".html"
+
 	w, werr := os.OpenFile(filepath, os.O_RDWR|os.O_CREATE, 0666)
 	defer w.Close()
 	if werr != nil {
