@@ -31,12 +31,12 @@ func (p *Post) save() error {
 }
 
 /*
- * Utils
+* Utils
  */
 func convertToMarkdownFilename(urlPath string) string {
 	res := strings.Replace(urlPath, "-", "_", -1)
 	res = strings.Replace(res, " ", "_", -1)
-  res = strings.ToLower(res)
+	res = strings.ToLower(res)
 	res = "content/" + res + ".md"
 	return res
 }
@@ -119,17 +119,17 @@ func adminHandler(w http.ResponseWriter, request *http.Request) {
 }
 
 func saveHandler(w http.ResponseWriter, req *http.Request) {
-  title := req.FormValue("Title")
-  body := req.FormValue("Body")
-  post := &Post{Title: title, Body: []byte(body)}
-  
-  err := post.save()
-  
-  if err != nil {
-    http.Error(w, err.Error(), http.StatusInternalServerError)
-    return
-  }
-  
+	title := req.FormValue("Title")
+	body := req.FormValue("Body")
+	post := &Post{Title: title, Body: []byte(body)}
+
+	err := post.save()
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
 	http.Redirect(w, req, "/admin", 303)
 }
 
