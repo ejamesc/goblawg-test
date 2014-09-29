@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/gorilla/mux"
 	"github.com/russross/blackfriday"
@@ -33,10 +34,15 @@ func (p *Post) save() error {
 /*
 * Utils
  */
-func convertToMarkdownFilename(urlPath string) string {
-	res := strings.Replace(urlPath, "-", "_", -1)
+func convertToMarkdownFilename(title string) string {
+	const layout = "2 Jan 2006 "
+	t := time.Now()
+	title = t.Format(layout) + title
+
+	res := strings.Replace(title, "-", "_", -1)
 	res = strings.Replace(res, " ", "_", -1)
 	res = strings.ToLower(res)
+
 	res = "content/" + res + ".md"
 	return res
 }
