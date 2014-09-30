@@ -1,0 +1,37 @@
+{{ template "adminheader" }}
+
+
+
+<div class="features">
+<h2>Admin</h2>
+<form action="/admin/save" method="POST">
+  <p>Here be a form to edit blog posts with.</p>
+  <input name="Title" type="text" placeholder="Title" />
+    <section class="editor">
+      <div class="outer">
+        <div class="editorwrap">
+          <section class="entry-markdown">
+            <header class="floatingheader">
+              &nbsp;&nbsp; Markdown 
+            </header>
+            <section class="entry-markdown-content">
+              <textarea name="Body" id="entry-markdown">Start writing a post.</textarea>
+            </section>
+          </section>
+          <section class="entry-preview active">
+            <header class="floatingheader">
+              &nbsp;&nbsp; Preview <span class="entry-word-count">0 words</span>
+            </header>
+            <section class="entry-preview-content">
+              <div class="rendered-markdown"></div>
+            </section>
+          </section>
+        </div>
+      </div>
+      <input type="submit" class="button" value="Submit"/>
+    </section>
+  </form>
+
+  </div>
+
+  {{ template "adminfooter" }}
