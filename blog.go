@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"os"
 	"strings"
-	"time"
 
 	"github.com/gorilla/mux"
 	"github.com/russross/blackfriday"
@@ -27,6 +26,8 @@ type Content struct {
 }
 
 func (p *Post) save() error {
+	//const layout = "2 Jan 2006 "
+	//t := time.Now()
 	filename := convertToMarkdownFilename(p.Title)
 	return ioutil.WriteFile(filename, p.Body, 0600)
 }
@@ -35,10 +36,6 @@ func (p *Post) save() error {
 * Utils
  */
 func convertToMarkdownFilename(title string) string {
-	const layout = "2 Jan 2006 "
-	t := time.Now()
-	title = t.Format(layout) + title
-
 	res := strings.Replace(title, "-", "_", -1)
 	res = strings.Replace(res, " ", "_", -1)
 	res = strings.ToLower(res)
@@ -47,8 +44,8 @@ func convertToMarkdownFilename(title string) string {
 	return res
 }
 
-func convertToDisplayTitle(urlPath string) string {
-	res := strings.Replace(urlPath, "-", " ", -1)
+func convertToDisplayTitle(filename string) string {
+	res := strings.Replace(filename, "-", " ", -1)
 	res = strings.Replace(res, "_", " ", -1)
 	res = strings.Title(res)
 	return res
