@@ -90,7 +90,7 @@ func loadPost(title string) (*Content, error) {
 // TODO: better way to do this?
 var templates = template.Must(template.ParseFiles(
 	"templates/partials.html",
-	"templates/admin.html",
+	"templates/newpost.html",
 	"templates/view.html"))
 
 /*
@@ -99,6 +99,7 @@ var templates = template.Must(template.ParseFiles(
 func main() {
 	r := mux.NewRouter()
 	r.HandleFunc("/admin", adminHandler)
+	r.HandleFunc("/admin/new", newPostHandler)
 	r.HandleFunc("/admin/save", saveHandler).Methods("POST")
 	r.HandleFunc("/view/{title}", viewHandler)
 	r.HandleFunc("/generate/{title}", generateHandler)
@@ -112,9 +113,23 @@ func main() {
  * Handlers
  */
 // TODO: List out all posts
+func adminHandler(w http.ResponseWriter, req *http.Request) {
+	listFileInfo, err := ioutil.ReadDir("content/")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 
-func adminHandler(w http.ResponseWriter, request *http.Request) {
-	renderTemplate(w, "admin", nil)
+	fileNames := make([]string, len(listFileInfo))
+	for i, entry := range listFileInfo {
+		fileNames[i] = entry.Name()
+	}
+
+	fmt.Fprintf(w, "%s", fileNames)
+}
+
+func newPostHandler(w http.ResponseWriter, req *http.Request) {
+	renderTemplate(w, "newpost", nil)
 }
 
 func saveHandler(w http.ResponseWriter, req *http.Request) {
@@ -129,7 +144,7 @@ func saveHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	http.Redirect(w, req, "/admin", 303)
+	http.Redirect(w, req, "admin/new", 303)
 }
 
 func viewHandler(w http.ResponseWriter, request *http.Request) {
