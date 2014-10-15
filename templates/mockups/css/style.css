@@ -12,6 +12,7 @@ body {
 }
 
 p, li { 
+  color: rgba(0, 0, 0, 0.8);
   line-height: 140%; 
   font-size: 1.25rem; 
   font-family: 'calluna', Georgia, serif; 
@@ -20,7 +21,7 @@ p, li {
 h1, h2, h3, h4, h5 { font-family: 'adelle', Georgia, serif; }
 
 p a {
-  color: #333;
+  color: rgba(0, 0, 0, 0.8);
   border-bottom: 1px dotted #555;
 }
 
@@ -135,6 +136,21 @@ footer {
   margin-top: 10px;
   font-size: 1.1rem;
 }
+
+/*
+ * Code Styles
+ */
+
+.code {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid #ddd;
+}
+
+.code h2 { line-height: 100%; }
+.code h2 a { font-size: 1.6rem; color: #005a88; }
+.code h2 a:hover { border-bottom: 1px dotted #aaa; color: #008cba; }
+.code p { font-size: 1.1rem; }
 
 /* Phones */
 @media only screen {
