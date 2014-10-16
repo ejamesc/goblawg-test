@@ -1,4 +1,4 @@
-package test
+package goblawg_test
 
 import (
 	"fmt"
