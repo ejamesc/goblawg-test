@@ -1,9 +1,11 @@
 package goblawg_test
 
 import (
+	"github.com/ejamesc/goblawg"
+	"io/ioutil"
 	"testing"
 )
 
-func TestIsMarkDownFile(t *testing.T) {
+func TestLoadPost(t *testing.T) {
 
 }
