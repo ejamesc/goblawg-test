@@ -19,7 +19,7 @@ type Post struct {
 	Time  time.Time
 }
 
-var r = regexp.MustCompile(`(\d{1,2}-[a-z]{3}-\d{4}-\d{1,2}-\d{1,2}-\d{1,2})-(.)`)
+var r = regexp.MustCompile(`(\d{1,2}-[a-zA-Z]{3}-\d{4}-\d{1,2}-\d{1,2}-\d{1,2})-(.*)`)
 
 const layout = "2-Jan-2006-15-04-05"
 
@@ -56,7 +56,6 @@ func LoadPost(path string, fi os.FileInfo) (*Post, error) {
 	p := &Post{}
 
 	name := fi.Name()
-	// Assume filename is 2-jan-2006-15-04-05-it-was-a-riot.md
 	m := r.FindStringSubmatch(name)
 	t, _ := time.Parse(layout, m[1])
 	p.Time = t
@@ -64,7 +63,7 @@ func LoadPost(path string, fi os.FileInfo) (*Post, error) {
 	filename := m[2]
 	filename_parts := strings.Split(filename, ".")
 	title := strings.Replace(filename_parts[0], "-", " ", -1)
-	p.Title = strings.ToUpper(title)
+	p.Title = strings.Title(title)
 
 	body, err := ioutil.ReadFile(path)
 	if err != nil {
