@@ -1,6 +1,7 @@
 package goblawg
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path"
@@ -53,6 +54,10 @@ func NewGenerator(dir string) (*Generator, error) {
 }
 
 func LoadPost(path string, fi os.FileInfo) (*Post, error) {
+	if !isMarkdownFile(path) {
+		return nil, fmt.Errorf("%s does not have an acceptable file extension.", path)
+	}
+
 	p := &Post{}
 
 	name := fi.Name()
@@ -84,7 +89,7 @@ func (p *Post) LoadPost(f os.FileInfo) {
 // Helper Functions
 func isMarkdownFile(n string) bool {
 	ext := path.Ext(n)
-	if ext == "md" || ext == "markdown" || ext == "txt" {
+	if ext == ".md" || ext == ".markdown" || ext == ".txt" {
 		return true
 	} else {
 		return false
