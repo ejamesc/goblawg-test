@@ -15,21 +15,21 @@ var bodyBytes = []byte("Hello world, this is my first post")
 const layout = "2-Jan-2006-15-04-05"
 const layout2 = "2 Jan 2006, 15:04:05"
 
-// Ensure that LoadPost will throw an error on a non .md, .markdown or .txt file
-func TestLoadPost_BadFile(t *testing.T) {
+// Ensure that NewPostFromFile will throw an error on a non .md, .markdown or .txt file
+func TestNewPostFromFile_BadFile(t *testing.T) {
 	path, fi := setup("", "superbadfilename")
-	_, err := goblawg.LoadPost(path, fi)
+	_, err := goblawg.NewPostFromFile(path, fi)
 
 	assert(t, err != nil, "err: %s", err)
 
 	teardown(path)
 }
 
-// Ensure that LoadPost actually returns a well-formed, filled Post
-func TestLoadPost(t *testing.T) {
+// Ensure that NewPostFromFile actually returns a well-formed, filled Post
+func TestNewPostFromFile(t *testing.T) {
 	path, fi := setup("", "")
 
-	p, err := goblawg.LoadPost(path, fi)
+	p, err := goblawg.NewPostFromFile(path, fi)
 	ok(t, err)
 
 	time, _ := time.Parse(layout, "2-Oct-2014-15-04-06")
@@ -64,18 +64,19 @@ func TestNewGenerator(t *testing.T) {
 
 	var posts []*goblawg.Post
 	for _, tfi := range files {
-		p, _ := goblawg.LoadPost(tfi.Path, tfi.FileInfo)
+		p, _ := goblawg.NewPostFromFile(tfi.Path, tfi.FileInfo)
 		posts = append(posts, p)
 	}
 
 	g, err := goblawg.NewGenerator(dir)
 
 	ok(t, err)
-	equals(t, posts, g.Posts)
+	equals(t, posts, g.GetPosts())
 
 	// Teardown
 	for _, tfi := range files {
 		teardown(tfi.Path)
+		teardown(badFilePath)
 	}
 }
 

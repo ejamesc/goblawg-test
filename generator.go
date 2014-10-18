@@ -10,8 +10,12 @@ import (
 	"time"
 )
 
+var r = regexp.MustCompile(`(\d{1,2}-[a-zA-Z]{3}-\d{4}-\d{1,2}-\d{1,2}-\d{1,2})-(.*)`)
+
+const layout = "2-Jan-2006-15-04-05"
+
 type Generator struct {
-	Posts []*Post
+	posts []*Post
 }
 
 type Post struct {
@@ -20,10 +24,7 @@ type Post struct {
 	Time  time.Time
 }
 
-var r = regexp.MustCompile(`(\d{1,2}-[a-zA-Z]{3}-\d{4}-\d{1,2}-\d{1,2}-\d{1,2})-(.*)`)
-
-const layout = "2-Jan-2006-15-04-05"
-
+// Rawr, a generator factory!
 func NewGenerator(dir string) (*Generator, error) {
 	listFileInfo, err := ioutil.ReadDir(dir)
 	if err != nil {
@@ -38,21 +39,27 @@ func NewGenerator(dir string) (*Generator, error) {
 	}
 
 	g := &Generator{}
-	g.Posts = make([]*Post, len(markdownFileList))
+	g.posts = make([]*Post, len(markdownFileList))
 	for i, entry := range markdownFileList {
 		fpath := path.Join(dir, entry.Name())
-		p, err := LoadPost(fpath, entry)
+		p, err := NewPostFromFile(fpath, entry)
 		if err != nil {
 			return nil, err
 		}
 
-		g.Posts[i] = p
+		g.posts[i] = p
 	}
 
 	return g, nil
 }
 
-func LoadPost(path string, fi os.FileInfo) (*Post, error) {
+// Return the array of posts
+func (g *Generator) GetPosts() []*Post {
+	return g.posts
+}
+
+// Create a new post from file
+func NewPostFromFile(path string, fi os.FileInfo) (*Post, error) {
 	if !isMarkdownFile(path) {
 		return nil, fmt.Errorf("%s does not have a markdown or text file extension.", path)
 	}
@@ -60,11 +67,11 @@ func LoadPost(path string, fi os.FileInfo) (*Post, error) {
 	p := &Post{}
 
 	name := fi.Name()
-	m := r.FindStringSubmatch(name)
-	t, _ := time.Parse(layout, m[1])
+	filenameParts := r.FindStringSubmatch(name)
+	t, _ := time.Parse(layout, filenameParts[1])
 	p.Time = t
 
-	filename := m[2]
+	filename := filenameParts[2]
 	filename_parts := strings.Split(filename, ".")
 	title := strings.Replace(filename_parts[0], "-", " ", -1)
 	p.Title = strings.Title(title)
