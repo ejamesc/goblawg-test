@@ -21,7 +21,7 @@ type Post struct {
 
 var r = regexp.MustCompile(`(\d{1,2}-[a-z]{3}-\d{4}-\d{1,2}-\d{1,2}-\d{1,2})-(.)`)
 
-const layout = "2-jan-2006-15-04-05"
+const layout = "2-Jan-2006-15-04-05"
 
 func NewGenerator(dir string) (*Generator, error) {
 	listFileInfo, err := ioutil.ReadDir(dir)
