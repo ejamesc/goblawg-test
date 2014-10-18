@@ -25,6 +25,16 @@ func TestNewPostFromFile_BadFile(t *testing.T) {
 	teardown(path)
 }
 
+func TestNewPostFromFile_Draft(t *testing.T) {
+	path, fi := setup("", "_21-Oct-2013-14-06-10-the-shining.md")
+	p, err := goblawg.NewPostFromFile(path, fi)
+
+	ok(t, err)
+	assert(t, p.IsDraft == true, "")
+
+	teardown(path)
+}
+
 // Ensure that NewPostFromFile actually returns a well-formed, filled Post
 func TestNewPostFromFile(t *testing.T) {
 	path, fi := setup("", "")
@@ -34,7 +44,7 @@ func TestNewPostFromFile(t *testing.T) {
 
 	time, _ := time.Parse(layout, "2-Oct-2014-15-04-06")
 
-	expected := &goblawg.Post{"It Was A Riot", bodyBytes, time}
+	expected := &goblawg.Post{"It Was A Riot", bodyBytes, time, false}
 	equals(t, expected, p)
 	equals(t, "2 Oct 2014, 15:04:06", p.Time.Format(layout2))
 

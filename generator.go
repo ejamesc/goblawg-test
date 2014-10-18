@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-var r = regexp.MustCompile(`(\d{1,2}-[a-zA-Z]{3}-\d{4}-\d{1,2}-\d{1,2}-\d{1,2})-(.*)`)
+var r = regexp.MustCompile(`(_*)(\d{1,2}-[a-zA-Z]{3}-\d{4}-\d{1,2}-\d{1,2}-\d{1,2})-(.+)`)
 
 const layout = "2-Jan-2006-15-04-05"
 
@@ -19,9 +19,10 @@ type Generator struct {
 }
 
 type Post struct {
-	Title string
-	Body  []byte
-	Time  time.Time
+	Title   string
+	Body    []byte
+	Time    time.Time
+	IsDraft bool
 }
 
 // Rawr, a generator factory!
@@ -68,10 +69,18 @@ func NewPostFromFile(path string, fi os.FileInfo) (*Post, error) {
 
 	name := fi.Name()
 	filenameParts := r.FindStringSubmatch(name)
-	t, _ := time.Parse(layout, filenameParts[1])
+
+	underscore := filenameParts[1]
+	if underscore == "" {
+		p.IsDraft = false
+	} else {
+		p.IsDraft = true
+	}
+
+	t, _ := time.Parse(layout, filenameParts[2])
 	p.Time = t
 
-	filename := filenameParts[2]
+	filename := filenameParts[3]
 	filename_parts := strings.Split(filename, ".")
 	title := strings.Replace(filename_parts[0], "-", " ", -1)
 	p.Title = strings.Title(title)
