@@ -39,10 +39,9 @@ func NewGenerator(dir string) (*Generator, error) {
 
 	g := &Generator{}
 	g.Posts = make([]*Post, len(markdownFileList))
-	for i, entry := range listFileInfo {
-		path := path.Join(dir, entry.Name())
-		// TODO: why do I need to have a reference?
-		p, err := LoadPost(path, entry)
+	for i, entry := range markdownFileList {
+		fpath := path.Join(dir, entry.Name())
+		p, err := LoadPost(fpath, entry)
 		if err != nil {
 			return nil, err
 		}
@@ -55,7 +54,7 @@ func NewGenerator(dir string) (*Generator, error) {
 
 func LoadPost(path string, fi os.FileInfo) (*Post, error) {
 	if !isMarkdownFile(path) {
-		return nil, fmt.Errorf("%s does not have an acceptable file extension.", path)
+		return nil, fmt.Errorf("%s does not have a markdown or text file extension.", path)
 	}
 
 	p := &Post{}
@@ -80,13 +79,8 @@ func LoadPost(path string, fi os.FileInfo) (*Post, error) {
 	return p, nil
 }
 
-func (p *Post) LoadPost(f os.FileInfo) {
-	name := f.Name()
-	p.Title = name
-	// load body
-}
-
 // Helper Functions
+
 func isMarkdownFile(n string) bool {
 	ext := path.Ext(n)
 	if ext == ".md" || ext == ".markdown" || ext == ".txt" {
