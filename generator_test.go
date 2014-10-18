@@ -10,7 +10,7 @@ import (
 	"github.com/ejamesc/goblawg"
 )
 
-var helloWorld = []byte("Hello world, this is my first post")
+var bodyBytes = []byte("Hello world, this is my first post")
 
 const layout = "2-Jan-2006-15-04-05"
 const layout2 = "2 Jan 2006, 15:04:05"
@@ -34,7 +34,7 @@ func TestLoadPost(t *testing.T) {
 
 	time, _ := time.Parse(layout, "2-Oct-2014-15-04-06")
 
-	expected := &goblawg.Post{"It Was A Riot", helloWorld, time}
+	expected := &goblawg.Post{"It Was A Riot", bodyBytes, time}
 	equals(t, expected, p)
 	equals(t, "2 Oct 2014, 15:04:06", p.Time.Format(layout2))
 
@@ -51,6 +51,10 @@ func TestNewGenerator(t *testing.T) {
 	// Setup
 	dir := os.TempDir()
 	filenames := []string{"12-Dec-2013-23-03-07-fade-away-love.markdown", "15-Aug-2014-09-08-06-it-was-a-riot.md", ""}
+
+	// Setup bad file to show that NewGenerator ignores it
+	badFilePath := path.Join(dir, "badfilename")
+	ioutil.WriteFile(badFilePath, bodyBytes, 0600)
 
 	var files []*TestFileItem
 	for _, fname := range filenames {
@@ -76,7 +80,7 @@ func TestNewGenerator(t *testing.T) {
 }
 
 // Helpers
-
+// Create files necessary for testing
 func setup(pathname, filename string) (string, os.FileInfo) {
 	if filename == "" {
 		filename = "2-Oct-2014-15-04-06-it-was-a-riot.md"
@@ -88,7 +92,7 @@ func setup(pathname, filename string) (string, os.FileInfo) {
 	} else {
 		resPath = path.Join(pathname, filename)
 	}
-	ioutil.WriteFile(resPath, helloWorld, 0600)
+	ioutil.WriteFile(resPath, bodyBytes, 0600)
 
 	fi, _ := os.Stat(resPath)
 	return resPath, fi
