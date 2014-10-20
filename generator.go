@@ -7,6 +7,7 @@ import (
 	"path"
 	"regexp"
 	"strings"
+	"text/template"
 	"time"
 )
 
@@ -60,7 +61,36 @@ func (g *Generator) GetPosts() []*Post {
 }
 
 // Generates just the HTML version of the posts
-func (g *Generator) GeneratePostsHTML(outDir string) error {
+func (g *Generator) GeneratePostsHTML(outDir, templateLoc string) error {
+	if templateLoc == "" {
+		templateLoc = "templates/essay.html"
+	}
+
+	for _, post := range g.posts {
+		filepath := strings.Replace(post.Title, " ", "-", -1)
+		filepath = strings.ToLower(filepath)
+		filepath = path.Join(outDir, filepath)
+
+		dirErr := os.Mkdir(filepath, 0666)
+		if dirErr != nil {
+			return dirErr
+		}
+		filepath = path.Join(filepath, "index.html")
+
+		file, err := os.OpenFile(filepath, os.O_RDWR|os.O_CREATE, 0666)
+		defer file.Close()
+		if err != nil {
+			return err
+		}
+
+		t, err := template.ParseFiles(templateLoc)
+		if err != nil {
+			return err
+		}
+
+		t.Execute(file, post)
+	}
+
 	return nil
 }
 
