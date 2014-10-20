@@ -59,6 +59,11 @@ func (g *Generator) GetPosts() []*Post {
 	return g.posts
 }
 
+// Generates just the HTML version of the posts
+func (g *Generator) GeneratePostsHTML(outDir string) error {
+	return nil
+}
+
 // Create a new post from file
 func NewPostFromFile(path string, fi os.FileInfo) (*Post, error) {
 	if !isMarkdownFile(path) {
