@@ -56,15 +56,8 @@ type TestFileItem struct {
 	FileInfo os.FileInfo
 }
 
-// Test Generator reads from the filesystem the right posts
-func TestNewGenerator(t *testing.T) {
-	// Setup
-	dir := os.TempDir()
+func setupGenerator(dir string) ([]*goblawg.Post, []*TestFileItem) {
 	filenames := []string{"12-Dec-2013-23-03-07-fade-away-love.markdown", "15-Aug-2014-09-08-06-it-was-a-riot.md", ""}
-
-	// Setup bad file to show that NewGenerator ignores it
-	badFilePath := path.Join(dir, "badfilename")
-	ioutil.WriteFile(badFilePath, bodyBytes, 0600)
 
 	var files []*TestFileItem
 	for _, fname := range filenames {
@@ -78,6 +71,19 @@ func TestNewGenerator(t *testing.T) {
 		posts = append(posts, p)
 	}
 
+	return posts, files
+}
+
+// Test Generator reads from the filesystem the right posts
+func TestNewGenerator(t *testing.T) {
+	// Setup
+	dir := os.TempDir()
+	posts, files := setupGenerator(dir)
+
+	// Setup bad file to show that NewGenerator ignores it
+	badFilePath := path.Join(dir, "badfilename")
+	ioutil.WriteFile(badFilePath, bodyBytes, 0600)
+
 	g, err := goblawg.NewGenerator(dir)
 
 	ok(t, err)
@@ -88,6 +94,19 @@ func TestNewGenerator(t *testing.T) {
 		teardown(tfi.Path)
 		teardown(badFilePath)
 	}
+}
+
+// Mock the generator
+type TestGenerator struct {
+	posts                 []*goblawg.Post
+	GeneratePostsHTMLFunc func(string, string) error
+}
+
+func (g *TestGenerator) GeneratePostsHTML(inDir string, outDir string) error {
+	return g.GeneratePostsHTMLFunc(inDir, outDir)
+}
+
+func TestGenerator_GeneratePostsHTML(t *testing.T) {
 }
 
 // Helpers
