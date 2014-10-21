@@ -91,31 +91,24 @@ func TestNewGenerator(t *testing.T) {
 	teardown(badFilePath)
 }
 
-// Mock the generator
-type TestGenerator struct {
-	posts             []*goblawg.Post
-	GeneratePostsFunc func(string) error
+var postFixtures = []*goblawg.Post{
+	&goblawg.Post{"It Was A Riot", bodyBytes, time.Now(), false},
+	&goblawg.Post{"The World Tree", bodyBytes, time.Now(), false},
+	&goblawg.Post{"Fade Away Love", bodyBytes, time.Now(), false},
+	&goblawg.Post{"Blah blah test", bodyBytes, time.Now(), true},
 }
 
-func (g *TestGenerator) GeneratePostsHTML(outDir string) error {
-	return g.GeneratePostsFunc(outDir)
+func TestNewGeneratorWithPosts(t *testing.T) {
+	g := goblawg.NewGeneratorWithPosts(postFixtures)
+
+	equals(t, postFixtures, g.GetPosts())
 }
 
 func TestGenerator_GeneratePostsHTML(t *testing.T) {
-	posts := []*goblawg.Post{
-		&goblawg.Post{"It Was A Riot", bodyBytes, time.Now(), false},
-		&goblawg.Post{"The World Tree", bodyBytes, time.Now(), false},
-		&goblawg.Post{"Fade Away Love", bodyBytes, time.Now(), false},
-		&goblawg.Post{"Blah blah test", bodyBytes, time.Now(), true},
-	}
+	g := goblawg.NewGeneratorWithPosts(postFixtures)
 
-	// Setup mock
-	testG := TestGenerator{posts: posts}
-	g := goblawg.Generator{}
-
-	testG.GeneratePostsFunc = g.GeneratePostsHTML
 	dir := os.TempDir()
-	err := testG.GeneratePostsHTML(dir)
+	err := g.GeneratePostsHTML(dir, "")
 
 	ok(t, err)
 

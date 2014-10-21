@@ -55,6 +55,11 @@ func NewGenerator(dir string) (*Generator, error) {
 	return g, nil
 }
 
+func NewGeneratorWithPosts(ps []*Post) *Generator {
+	g := &Generator{ps}
+	return g
+}
+
 // Return the array of posts
 func (g *Generator) GetPosts() []*Post {
 	return g.posts
