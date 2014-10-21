@@ -76,13 +76,21 @@ func (g *Generator) GeneratePostsHTML(outDir, templateLoc string) error {
 		filepath = strings.ToLower(filepath)
 		filepath = path.Join(outDir, filepath)
 
-		dirErr := os.Mkdir(filepath, 0666)
+		_, err := os.Stat(filepath)
+		if err != nil {
+			// TODO: Change this
+			if os.IsExist(err) {
+				return err
+			}
+			return err
+		}
+		dirErr := os.Mkdir(filepath, 0776)
 		if dirErr != nil {
 			return dirErr
 		}
 		filepath = path.Join(filepath, "index.html")
 
-		file, err := os.OpenFile(filepath, os.O_RDWR|os.O_CREATE, 0666)
+		file, err := os.OpenFile(filepath, os.O_RDWR|os.O_CREATE, 0776)
 		defer file.Close()
 		if err != nil {
 			return err
