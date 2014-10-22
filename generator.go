@@ -72,21 +72,24 @@ func (g *Generator) GeneratePostsHTML(outDir, templateLoc string) error {
 	}
 
 	for _, post := range g.posts {
+		if post.IsDraft {
+			continue
+		}
 		filepath := strings.Replace(post.Title, " ", "-", -1)
 		filepath = strings.ToLower(filepath)
 		filepath = path.Join(outDir, filepath)
 
 		_, err := os.Stat(filepath)
 		if err != nil {
-			// TODO: Change this
+			// TODO: Change to check datetimestamp
 			if os.IsExist(err) {
 				return err
+			} else {
+				dirErr := os.Mkdir(filepath, 0776)
+				if dirErr != nil {
+					return dirErr
+				}
 			}
-			return err
-		}
-		dirErr := os.Mkdir(filepath, 0776)
-		if dirErr != nil {
-			return dirErr
 		}
 		filepath = path.Join(filepath, "index.html")
 

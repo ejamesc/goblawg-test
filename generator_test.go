@@ -61,7 +61,7 @@ type TestFileItem struct {
 func TestNewGenerator(t *testing.T) {
 	// Setup
 	dir := os.TempDir()
-	filenames := []string{"12-Dec-2013-23-03-07-fade-away-love.markdown", "15-Aug-2014-09-08-06-the-world-tree.md", ""}
+	filenames := []string{"12-Dec-2013-23-03-07-fade-away-love.markdown", "15-Aug-2014-09-08-06-the-world-tree.md", "", "_13-Oct-2014-23-07-08-this-is-draft.md"}
 
 	var files []*TestFileItem
 	for _, fname := range filenames {
@@ -82,6 +82,7 @@ func TestNewGenerator(t *testing.T) {
 	g, err := goblawg.NewGenerator(dir)
 
 	ok(t, err)
+	assert(t, len(g.GetPosts()) == 4, "")
 	equals(t, posts, g.GetPosts())
 
 	// Teardown
@@ -119,10 +120,14 @@ func TestGenerator_GeneratePostsHTML(t *testing.T) {
 	}
 
 	dirNames := []string{"it-was-a-riot", "the-world-tree", "fade-away-love"}
+	draftExists := false
 	var directories []os.FileInfo
 
 	for _, f := range fileInfoList {
 		if f.IsDir() {
+			if f.Name() == "blah-blah-test" {
+				draftExists = true
+			}
 			for _, name := range dirNames {
 				if name == f.Name() {
 					directories = append(directories, f)
@@ -131,19 +136,10 @@ func TestGenerator_GeneratePostsHTML(t *testing.T) {
 		}
 	}
 
-	// We expect the generate function to create 3 directories
+	// We expect the generate function to create the 3 folders
 	equals(t, len(dirNames), len(directories))
-
-	draftExists := false
-	for _, f := range fileInfoList {
-		if f.IsDir() {
-			if f.Name() == "blah-blah-test" {
-				draftExists = true
-			}
-		}
-	}
-
-	assert(t, !draftExists, "")
+	// We expect the draft to not be created
+	assert(t, draftExists == false, "")
 
 	// Teardown
 	for _, tmpDir := range directories {
