@@ -134,6 +134,17 @@ func TestGenerator_GeneratePostsHTML(t *testing.T) {
 	// We expect the generate function to create 3 directories
 	equals(t, len(dirNames), len(directories))
 
+	draftExists := false
+	for _, f := range fileInfoList {
+		if f.IsDir() {
+			if f.Name() == "blah-blah-test" {
+				draftExists = true
+			}
+		}
+	}
+
+	assert(t, !draftExists, "")
+
 	// Teardown
 	for _, tmpDir := range directories {
 		tempPath := path.Join(dir, tmpDir.Name())
