@@ -148,6 +148,34 @@ func TestGenerator_GeneratePostsHTML(t *testing.T) {
 	}
 }
 
+func TestGenerator_GeneratePostsHTMLWithFolderCreated(t *testing.T) {
+	g := goblawg.NewGeneratorWithPosts(postFixtures)
+
+	dir := os.TempDir()
+
+	folderName := path.Join(dir, "it-was-a-riot")
+	os.Mkdir(folderName, 0776)
+	ioutil.WriteFile(path.Join(folderName, "index.html"), bodyBytes, 0776)
+
+	err := g.GeneratePostsHTML(dir, "")
+
+	ok(t, err)
+
+	// Teardown
+	dirNames := []string{"it-was-a-riot", "the-world-tree", "fade-away-love"}
+	fileInfoList, _ := ioutil.ReadDir(dir)
+	for _, f := range fileInfoList {
+		if f.IsDir() {
+			for _, name := range dirNames {
+				if name == f.Name() {
+					tmpPath := path.Join(dir, name)
+					os.Remove(tmpPath)
+				}
+			}
+		}
+	}
+}
+
 // Helpers
 // Create files necessary for testing
 func setup(pathname, filename string) (string, os.FileInfo) {

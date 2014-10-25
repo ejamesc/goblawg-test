@@ -86,14 +86,15 @@ func (g *Generator) GeneratePostsHTML(outDir, templateLoc string) error {
 				return dirErr
 			}
 		} else {
-			// Delete folder if it currently exists
-			remErr := os.RemoveAll(filepath)
+			// Delete index.html if it currently exists
+			remPath := path.Join(filepath, "index.html")
+			remErr := os.Remove(remPath)
 			if remErr != nil {
 				return remErr
 			}
 		}
-		filepath = path.Join(filepath, "index.html")
 
+		filepath = path.Join(filepath, "index.html")
 		file, err := os.OpenFile(filepath, os.O_RDWR|os.O_CREATE, 0776)
 		defer file.Close()
 		if err != nil {
