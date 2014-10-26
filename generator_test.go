@@ -173,7 +173,7 @@ func TestGenerator_GeneratePostsHTMLWithFolderCreated(t *testing.T) {
 			for _, name := range dirNames {
 				if name == f.Name() {
 					tmpPath := path.Join(dir, name)
-					os.Remove(tmpPath)
+					os.RemoveAll(tmpPath)
 				}
 			}
 		}
