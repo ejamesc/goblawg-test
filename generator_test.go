@@ -43,9 +43,9 @@ func TestNewPostFromFile(t *testing.T) {
 	p, err := goblawg.NewPostFromFile(path, fi)
 	ok(t, err)
 
-	time, _ := time.Parse(layout, "2-Oct-2014-15-04-06")
+	tts, _ := time.Parse(layout, "2-Oct-2014-15-04-06")
 
-	expected := &goblawg.Post{"It Was A Riot", bodyBytes, time, false}
+	expected := &goblawg.Post{"It Was A Riot", bodyBytes, tts, false, fi.ModTime()}
 	equals(t, expected, p)
 	equals(t, "2 Oct 2014, 15:04:06", p.Time.Format(layout2))
 
@@ -79,7 +79,8 @@ func TestNewGenerator(t *testing.T) {
 	badFilePath := path.Join(dir, "badfilename")
 	ioutil.WriteFile(badFilePath, bodyBytes, 0600)
 
-	g, err := goblawg.NewGenerator(dir)
+	lastGenerated := time.Now().Add(20 * time.Minute)
+	g, err := goblawg.NewGenerator(dir, lastGenerated)
 
 	ok(t, err)
 	assert(t, len(g.GetPosts()) == 4, "Expected 4 posts, instead got %v", len(g.GetPosts()))
@@ -93,10 +94,10 @@ func TestNewGenerator(t *testing.T) {
 }
 
 var postFixtures = []*goblawg.Post{
-	&goblawg.Post{"It Was A Riot", bodyBytes, time.Now(), false},
-	&goblawg.Post{"The World Tree", bodyBytes, time.Now(), false},
-	&goblawg.Post{"Fade Away Love", bodyBytes, time.Now(), false},
-	&goblawg.Post{"Blah blah test", bodyBytes, time.Now(), true},
+	&goblawg.Post{"It Was A Riot", bodyBytes, time.Now(), false, time.Now()},
+	&goblawg.Post{"The World Tree", bodyBytes, time.Now(), false, time.Now()},
+	&goblawg.Post{"Fade Away Love", bodyBytes, time.Now(), false, time.Now()},
+	&goblawg.Post{"Blah blah test", bodyBytes, time.Now(), true, time.Now()},
 }
 
 // Test that we can create a Generator with a given list of posts

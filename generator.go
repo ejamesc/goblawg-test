@@ -16,18 +16,20 @@ var r = regexp.MustCompile(`(_*)(\d{1,2}-[a-zA-Z]{3}-\d{4}-\d{1,2}-\d{1,2}-\d{1,
 const layout = "2-Jan-2006-15-04-05"
 
 type Generator struct {
-	posts []*Post
+	posts         []*Post
+	lastGenerated time.Time
 }
 
 type Post struct {
-	Title   string
-	Body    []byte
-	Time    time.Time
-	IsDraft bool
+	Title        string
+	Body         []byte
+	Time         time.Time
+	IsDraft      bool
+	LastModified time.Time
 }
 
 // Rawr, a generator factory!
-func NewGenerator(dir string) (*Generator, error) {
+func NewGenerator(dir string, lastGenerated time.Time) (*Generator, error) {
 	listFileInfo, err := ioutil.ReadDir(dir)
 	if err != nil {
 		return nil, err
@@ -41,6 +43,7 @@ func NewGenerator(dir string) (*Generator, error) {
 	}
 
 	g := &Generator{}
+	g.lastGenerated = lastGenerated
 	g.posts = make([]*Post, len(markdownFileList))
 	for i, entry := range markdownFileList {
 		fpath := path.Join(dir, entry.Name())
@@ -133,6 +136,7 @@ func NewPostFromFile(path string, fi os.FileInfo) (*Post, error) {
 
 	t, _ := time.Parse(layout, filenameParts[2])
 	p.Time = t
+	p.LastModified = fi.ModTime()
 
 	filename := filenameParts[3]
 	filename_parts := strings.Split(filename, ".")
