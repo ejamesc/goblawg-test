@@ -44,11 +44,11 @@ func NewGenerator(dir string) (*Generator, error) {
 	g.posts = make([]*Post, len(markdownFileList))
 	for i, entry := range markdownFileList {
 		fpath := path.Join(dir, entry.Name())
+
 		p, err := NewPostFromFile(fpath, entry)
 		if err != nil {
 			return nil, err
 		}
-
 		g.posts[i] = p
 	}
 
@@ -56,7 +56,8 @@ func NewGenerator(dir string) (*Generator, error) {
 }
 
 func NewGeneratorWithPosts(ps []*Post) *Generator {
-	g := &Generator{ps}
+	g := &Generator{}
+	g.posts = ps
 	return g
 }
 

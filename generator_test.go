@@ -31,7 +31,7 @@ func TestNewPostFromFile_Draft(t *testing.T) {
 	p, err := goblawg.NewPostFromFile(path, fi)
 
 	ok(t, err)
-	assert(t, p.IsDraft == true, "")
+	assert(t, p.IsDraft == true, "Post is not a draft")
 
 	teardown(path)
 }
@@ -82,7 +82,7 @@ func TestNewGenerator(t *testing.T) {
 	g, err := goblawg.NewGenerator(dir)
 
 	ok(t, err)
-	assert(t, len(g.GetPosts()) == 4, "")
+	assert(t, len(g.GetPosts()) == 4, "Expected 4 posts, instead got %v", len(g.GetPosts()))
 	equals(t, posts, g.GetPosts())
 
 	// Teardown
@@ -99,12 +99,14 @@ var postFixtures = []*goblawg.Post{
 	&goblawg.Post{"Blah blah test", bodyBytes, time.Now(), true},
 }
 
+// Test that we can create a Generator with a given list of posts
 func TestNewGeneratorWithPosts(t *testing.T) {
 	g := goblawg.NewGeneratorWithPosts(postFixtures)
 
 	equals(t, postFixtures, g.GetPosts())
 }
 
+// Test the ability to generate HTML from our posts
 func TestGenerator_GeneratePostsHTML(t *testing.T) {
 	g := goblawg.NewGeneratorWithPosts(postFixtures)
 
@@ -136,10 +138,10 @@ func TestGenerator_GeneratePostsHTML(t *testing.T) {
 		}
 	}
 
-	// We expect the generate function to create the 3 folders
+	// We expect the generate function to create 3 folders
 	equals(t, len(dirNames), len(directories))
 	// We expect the draft to not be created
-	assert(t, draftExists == false, "")
+	assert(t, draftExists == false, "Draft shouldn't exist.")
 
 	// Teardown
 	for _, tmpDir := range directories {
@@ -148,6 +150,7 @@ func TestGenerator_GeneratePostsHTML(t *testing.T) {
 	}
 }
 
+// Test generating a post with a folder already created
 func TestGenerator_GeneratePostsHTMLWithFolderCreated(t *testing.T) {
 	g := goblawg.NewGeneratorWithPosts(postFixtures)
 
