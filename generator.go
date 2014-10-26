@@ -58,9 +58,10 @@ func NewGenerator(dir string, lastGenerated time.Time) (*Generator, error) {
 	return g, nil
 }
 
-func NewGeneratorWithPosts(ps []*Post) *Generator {
+func NewGeneratorWithPosts(ps []*Post, lastGenerated time.Time) *Generator {
 	g := &Generator{}
 	g.posts = ps
+	g.lastGenerated = lastGenerated
 	return g
 }
 
@@ -89,7 +90,7 @@ func (g *Generator) GeneratePostsHTML(outDir, templateLoc string) error {
 			if dirErr != nil {
 				return dirErr
 			}
-		} else {
+		} else if g.lastGenerated.Before(post.LastModified) || g.lastGenerated.Equal(post.LastModified) {
 			// Delete index.html if it currently exists
 			remPath := path.Join(filepath, "index.html")
 			remErr := os.Remove(remPath)
@@ -98,19 +99,21 @@ func (g *Generator) GeneratePostsHTML(outDir, templateLoc string) error {
 			}
 		}
 
-		filepath = path.Join(filepath, "index.html")
-		file, err := os.OpenFile(filepath, os.O_RDWR|os.O_CREATE, 0776)
-		defer file.Close()
-		if err != nil {
-			return err
-		}
+		if g.lastGenerated.Before(post.LastModified) || g.lastGenerated.Equal(post.LastModified) {
+			filepath = path.Join(filepath, "index.html")
+			file, err := os.OpenFile(filepath, os.O_RDWR|os.O_CREATE, 0776)
+			defer file.Close()
+			if err != nil {
+				return err
+			}
 
-		t, err := template.ParseFiles(templateLoc)
-		if err != nil {
-			return err
-		}
+			t, err := template.ParseFiles(templateLoc)
+			if err != nil {
+				return err
+			}
 
-		t.Execute(file, post)
+			t.Execute(file, post)
+		}
 	}
 
 	return nil
