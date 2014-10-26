@@ -19,20 +19,18 @@ const layout2 = "2 Jan 2006, 15:04:05"
 func TestNewPostFromFile_BadFile(t *testing.T) {
 	path, fi := setup("", "superbadfilename")
 	_, err := goblawg.NewPostFromFile(path, fi)
+	defer teardown(path)
 
 	assert(t, err != nil, "err: %s", err)
-
-	teardown(path)
 }
 
 func TestNewPostFromFile_Draft(t *testing.T) {
 	path, fi := setup("", "_21-Oct-2013-14-06-10-the-shining.md")
 	p, err := goblawg.NewPostFromFile(path, fi)
+	defer teardown(path)
 
 	ok(t, err)
 	assert(t, p.IsDraft == true, "Post is not a draft")
-
-	teardown(path)
 }
 
 // Ensure that NewPostFromFile actually returns a well-formed, filled Post
@@ -40,6 +38,7 @@ func TestNewPostFromFile(t *testing.T) {
 	path, fi := setup("", "")
 
 	p, err := goblawg.NewPostFromFile(path, fi)
+	defer teardown(path)
 	ok(t, err)
 
 	tts, _ := time.Parse(layout, "2-Oct-2014-15-04-06")
@@ -47,8 +46,6 @@ func TestNewPostFromFile(t *testing.T) {
 	expected := &goblawg.Post{"It Was A Riot", bodyBytes, tts, false, fi.ModTime()}
 	equals(t, expected, p)
 	equals(t, "2 Oct 2014, 15:04:06", p.Time.Format(layout2))
-
-	teardown(path)
 }
 
 type TestFileItem struct {
@@ -81,15 +78,15 @@ func TestNewGenerator(t *testing.T) {
 	lastGenerated := time.Now().Add(-20 * time.Minute)
 	g, err := goblawg.NewGenerator(dir, lastGenerated)
 
+	// Teardown
+	for _, tfi := range files {
+		defer teardown(tfi.Path)
+	}
+	defer teardown(badFilePath)
+
 	ok(t, err)
 	assert(t, len(g.GetPosts()) == 4, "Expected 4 posts, instead got %v", len(g.GetPosts()))
 	equals(t, posts, g.GetPosts())
-
-	// Teardown
-	for _, tfi := range files {
-		teardown(tfi.Path)
-	}
-	teardown(badFilePath)
 }
 
 var timeNow = time.Now()
@@ -175,14 +172,6 @@ func TestGenerator_GeneratePostsHTMLAfterDateModified(t *testing.T) {
 	assert(t, fileExistsErr != nil, "Generator generates fade-away-love/index.html, when it should not")
 }
 
-func generator_teardown(dir string, generatedDirs []os.FileInfo) {
-	for _, tmpDir := range generatedDirs {
-		tempPath := path.Join(dir, tmpDir.Name())
-		os.RemoveAll(tempPath)
-	}
-
-}
-
 // Test generating a post with a folder already created
 func TestGenerator_GeneratePostsHTMLWithFolderCreated(t *testing.T) {
 	g := goblawg.NewGeneratorWithPosts(postFixtures, time.Time{})
@@ -237,4 +226,11 @@ func setup(pathname, filename string) (string, os.FileInfo) {
 
 func teardown(path string) {
 	os.Remove(path)
+}
+
+func generator_teardown(dir string, generatedDirs []os.FileInfo) {
+	for _, tmpDir := range generatedDirs {
+		tempPath := path.Join(dir, tmpDir.Name())
+		os.RemoveAll(tempPath)
+	}
 }
