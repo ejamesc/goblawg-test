@@ -9,6 +9,7 @@ import (
 	"github.com/ejamesc/goblawg"
 )
 
+// Test NewBlog constructs and returns a Blog struct correctly
 func TestNewBlog(t *testing.T) {
 	// Setup
 	dir := os.TempDir()

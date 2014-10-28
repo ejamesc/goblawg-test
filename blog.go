@@ -25,8 +25,8 @@ type config struct {
 	LastGen string
 }
 
-func NewBlog(settings string) (*Blog, error) {
-	dec := json.NewDecoder(strings.NewReader(settings))
+func NewBlog(settingsJSON string) (*Blog, error) {
+	dec := json.NewDecoder(strings.NewReader(settingsJSON))
 	var c config
 
 	err := dec.Decode(&c)
