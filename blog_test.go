@@ -10,6 +10,7 @@ import (
 )
 
 func TestNewBlog(t *testing.T) {
+	// Setup
 	dir := os.TempDir()
 	path, fi := setup(dir, "")
 	post, _ := goblawg.NewPostFromFile(path, fi)
@@ -20,6 +21,9 @@ func TestNewBlog(t *testing.T) {
 	g := goblawg.NewGeneratorWithPosts(postList, testTime)
 
 	b, err := goblawg.NewBlog(settingsJSON)
+
+	// Teardown
+	defer teardown(path)
 
 	ok(t, err)
 
