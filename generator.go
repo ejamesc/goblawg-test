@@ -29,31 +29,16 @@ type Post struct {
 }
 
 // Rawr, a generator factory!
+// TODO: Might want to remove this, for smaller API
 func NewGenerator(dir string, lastGenerated time.Time) (*Generator, error) {
-	listFileInfo, err := ioutil.ReadDir(dir)
+	posts, err := loadPostsFromDir(dir)
 	if err != nil {
 		return nil, err
 	}
 
-	var markdownFileList []os.FileInfo
-	for _, entry := range listFileInfo {
-		if isMarkdownFile(entry.Name()) {
-			markdownFileList = append(markdownFileList, entry)
-		}
-	}
-
 	g := &Generator{}
 	g.lastGenerated = lastGenerated
-	g.posts = make([]*Post, len(markdownFileList))
-	for i, entry := range markdownFileList {
-		fpath := path.Join(dir, entry.Name())
-
-		p, err := NewPostFromFile(fpath, entry)
-		if err != nil {
-			return nil, err
-		}
-		g.posts[i] = p
-	}
+	g.posts = posts
 
 	return g, nil
 }
