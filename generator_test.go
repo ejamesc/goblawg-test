@@ -16,12 +16,20 @@ const layout = "2-Jan-2006-15-04-05"
 const layout2 = "2 Jan 2006, 15:04:05"
 
 // Ensure that NewPostFromFile will throw an error on a non .md, .markdown or .txt file
-func TestNewPostFromFile_BadFile(t *testing.T) {
+func TestNewPostFromFile_BadFileExtension(t *testing.T) {
 	path, fi := setup("", "superbadfilename")
 	_, err := goblawg.NewPostFromFile(path, fi)
 	defer teardown(path)
 
-	assert(t, err != nil, "err: %s", err)
+	assert(t, err != nil, "Expected err: no markdown file extension.")
+}
+
+func TestNewPostFromFile_BadFileNameFormat(t *testing.T) {
+	path, fi := setup("", "_21-Oct-2013-14-05-10the-shining.md")
+	_, err := goblawg.NewPostFromFile(path, fi)
+	defer teardown(path)
+
+	assert(t, err != nil, "Expected err: wrong filename format")
 }
 
 func TestNewPostFromFile_Draft(t *testing.T) {
@@ -79,10 +87,12 @@ func TestNewGenerator(t *testing.T) {
 	g, err := goblawg.NewGenerator(dir, lastGenerated)
 
 	// Teardown
-	for _, tfi := range files {
-		defer teardown(tfi.Path)
-	}
-	defer teardown(badFilePath)
+	defer func() {
+		for _, tfi := range files {
+			teardown(tfi.Path)
+		}
+		teardown(badFilePath)
+	}()
 
 	ok(t, err)
 	assert(t, len(g.GetPosts()) == 4, "Expected 4 posts, instead got %v", len(g.GetPosts()))

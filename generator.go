@@ -115,6 +115,10 @@ func NewPostFromFile(path string, fi os.FileInfo) (*Post, error) {
 	name := fi.Name()
 	filenameParts := r.FindStringSubmatch(name)
 
+	if len(filenameParts) < 3 {
+		return nil, fmt.Errorf("%s has the wrong format!", name)
+	}
+
 	underscore := filenameParts[1]
 	if underscore == "" {
 		p.IsDraft = false
