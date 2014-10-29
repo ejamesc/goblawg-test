@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path"
 	"testing"
 	"time"
 
@@ -39,13 +40,14 @@ func TestNewBlog(t *testing.T) {
 func TestSavePost(t *testing.T) {
 	//Setup
 	dir := os.TempDir()
-	path, fi := setup(dir, "")
-	defer teardown(path)
+	testPath, fi := setup(dir, "")
+	defer teardown(testPath)
 
 	tts, _ := time.Parse(layout, "21-Oct-2013-14-06-10")
+	currTime := time.Now()
 
-	post1, _ := goblawg.NewPostFromFile(path, fi)
-	post2 := &goblawg.Post{"The Shining", bodyBytes, tts, true, time.Now()}
+	post1, _ := goblawg.NewPostFromFile(testPath, fi)
+	post2 := &goblawg.Post{"The Shining", bodyBytes, tts, true, currTime}
 
 	postListBefore := []*goblawg.Post{post1}
 	postListAfter := []*goblawg.Post{post1, post2}
@@ -58,11 +60,18 @@ func TestSavePost(t *testing.T) {
 
 	fileInfoList, _ := ioutil.ReadDir(dir)
 	fileGenerated := false
+	var postUnderTest *goblawg.Post
 	for _, fi := range fileInfoList {
 		if fi.Name() == "_21-Oct-2013-14-06-10-the-shining.md" {
 			fileGenerated = true
+			filePath := path.Join(dir, fi.Name())
+			postUnderTest, _ = goblawg.NewPostFromFile(filePath, fi)
+			defer teardown(filePath)
 		}
 	}
 
 	assert(t, fileGenerated == true, "Post not generated")
+	// Stub out the LastModified
+	postUnderTest.LastModified = currTime
+	equals(t, post2, postUnderTest)
 }
