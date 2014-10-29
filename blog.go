@@ -11,11 +11,11 @@ import (
 )
 
 type Blog struct {
-	Generator *Generator
-	Name      string
-	Posts     []*Post
-	InDir     string
-	OutDir    string
+	Name         string
+	Posts        []*Post
+	InDir        string
+	OutDir       string
+	LastModified time.Time
 }
 
 type config struct {
@@ -39,23 +39,43 @@ func NewBlog(settingsJSON string) (*Blog, error) {
 		return nil, err
 	}
 
-	t, err := time.Parse(layout, c.LastGen)
+	tts, err := time.Parse(layout, c.LastGen)
 	if err != nil {
 		return nil, err
 	}
 
-	g := NewGeneratorWithPosts(posts, t)
+	b := &Blog{}
+	b.Name = c.Name
+	b.Posts = posts
+	b.InDir = c.InDir
+	b.LastModified = tts
+	b.OutDir = c.OutDir
 
-	p := &Blog{}
-	p.Name = c.Name
-	p.Posts = posts
-	p.Generator = g
-	p.InDir = c.InDir
-	p.OutDir = c.OutDir
-
-	return p, nil
+	return b, nil
 }
 
+func (b *Blog) SavePost(post *Post) error {
+	title := strings.Replace(post.Title, " ", "-", -1)
+	title = strings.ToLower(title)
+	timeString := post.Time.Format(layout)
+	filename := timeString + "-" + title + ".md"
+
+	if post.IsDraft {
+		filename = "_" + filename
+	}
+
+	filepath := path.Join(b.OutDir, filename)
+	err := ioutil.WriteFile(filepath, post.Body, 0776)
+	if err != nil {
+		return err
+	}
+
+	b.Posts = append(b.Posts, post)
+
+	return nil
+}
+
+// Helpers
 func loadPostsFromDir(dir string) ([]*Post, error) {
 	listFileInfo, err := ioutil.ReadDir(dir)
 	if err != nil {
