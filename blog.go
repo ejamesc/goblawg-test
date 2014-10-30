@@ -54,6 +54,7 @@ func NewBlog(settingsJSON string) (*Blog, error) {
 	return b, nil
 }
 
+// Save a blog post and write to disk
 func (b *Blog) SavePost(post *Post) error {
 	title := strings.Replace(post.Title, " ", "-", -1)
 	title = strings.ToLower(title)
@@ -71,6 +72,20 @@ func (b *Blog) SavePost(post *Post) error {
 	}
 
 	b.Posts = append(b.Posts, post)
+	return nil
+}
+
+// Generate the entire blog
+// TODO: Copy over non-blog components
+func (b *Blog) GenerateHTML() error {
+	g := NewGeneratorWithPosts(b.Posts, b.LastModified)
+
+	err := g.GeneratePostsHTML(b.OutDir, "")
+	if err != nil {
+		return err
+	}
+
+	b.LastModified = time.Now()
 
 	return nil
 }

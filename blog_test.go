@@ -75,3 +75,26 @@ func TestSavePost(t *testing.T) {
 	postUnderTest.LastModified = currTime
 	equals(t, post2, postUnderTest)
 }
+
+// Test Generate HTML
+func TestGenerateHTML(t *testing.T) {
+	// Setup
+	dir := os.TempDir()
+	tts, _ := time.Parse(layout, "21-Oct-2013-14-06-10")
+	post := &goblawg.Post{"The Shining", bodyBytes, time.Now(), false, time.Now()}
+
+	b := &goblawg.Blog{Posts: []*goblawg.Post{post}, LastModified: tts, OutDir: dir}
+	err := b.GenerateHTML()
+
+	// Teardown
+	generatedPath := path.Join(dir, "the-shining")
+	defer os.RemoveAll(generatedPath)
+
+	ok(t, err)
+	assert(t, b.LastModified != tts, "Expected last modified timestamp to have been updated")
+
+	_, err1 := os.Stat(generatedPath)
+	_, err2 := os.Stat(path.Join(generatedPath, "index.html"))
+	ok(t, err1)
+	ok(t, err2)
+}
