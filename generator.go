@@ -62,21 +62,27 @@ func (g *Generator) GeneratePostsHTML(outDir, templateLoc string) error {
 	}
 
 	for _, post := range g.posts {
-		if post.IsDraft {
-			continue
-		}
 		filepath := strings.Replace(post.Title, " ", "-", -1)
 		filepath = strings.ToLower(filepath)
 		filepath = path.Join(outDir, filepath)
 
 		_, err := os.Stat(filepath)
+		if post.IsDraft {
+			if err == nil {
+				os.RemoveAll(filepath)
+			}
+			continue
+		}
+
 		if err != nil && os.IsNotExist(err) {
 			dirErr := os.Mkdir(filepath, 0776)
 			if dirErr != nil {
 				return dirErr
 			}
+			// There is no error, and the folder already exists
 		} else if g.lastGenerated.Before(post.LastModified) || g.lastGenerated.Equal(post.LastModified) {
 			// Delete index.html if it currently exists
+			// TODO: Why do I need to delete?
 			remPath := path.Join(filepath, "index.html")
 			remErr := os.Remove(remPath)
 			if remErr != nil {

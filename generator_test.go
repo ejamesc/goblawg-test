@@ -15,7 +15,7 @@ var bodyBytes = []byte("Hello world, this is my first post")
 const layout = "2-Jan-2006-15-04-05"
 const layout2 = "2 Jan 2006, 15:04:05"
 
-// Ensure that NewPostFromFile will throw an error on a non .md, .markdown or .txt file
+// Ensure that NewPostFromFile will return an error on a non .md, .markdown or .txt file
 func TestNewPostFromFile_BadFileExtension(t *testing.T) {
 	path, fi := setup("", "superbadfilename")
 	_, err := goblawg.NewPostFromFile(path, fi)
@@ -24,6 +24,8 @@ func TestNewPostFromFile_BadFileExtension(t *testing.T) {
 	assert(t, err != nil, "Expected err: no markdown file extension.")
 }
 
+// Ensure NewPostFromFile will return an error (and not panic) from a markdown
+// file with a bad filename
 func TestNewPostFromFile_BadFileNameFormat(t *testing.T) {
 	path, fi := setup("", "_21-Oct-2013-14-05-10the-shining.md")
 	_, err := goblawg.NewPostFromFile(path, fi)
@@ -32,6 +34,7 @@ func TestNewPostFromFile_BadFileNameFormat(t *testing.T) {
 	assert(t, err != nil, "Expected err: wrong filename format")
 }
 
+// Ensure that a filename with an underscore in front is marked as a draft
 func TestNewPostFromFile_Draft(t *testing.T) {
 	path, fi := setup("", "_21-Oct-2013-14-06-10-the-shining.md")
 	p, err := goblawg.NewPostFromFile(path, fi)
@@ -153,6 +156,7 @@ func TestGenerator_GeneratePostsHTML(t *testing.T) {
 	assert(t, draftExists == false, "Draft shouldn't exist.")
 }
 
+// Ensure that only posts modified after the last modified timestamp are generated
 func TestGenerator_GeneratePostsHTMLAfterDateModified(t *testing.T) {
 	// Setup
 	dir := os.TempDir()
@@ -182,10 +186,9 @@ func TestGenerator_GeneratePostsHTMLAfterDateModified(t *testing.T) {
 	assert(t, fileExistsErr != nil, "Generator generates fade-away-love/index.html, when it should not")
 }
 
-// Test generating a post with a folder already created
+// Test generating a post with a folder already created doesn't return an error
 func TestGenerator_GeneratePostsHTMLWithFolderCreated(t *testing.T) {
 	g := goblawg.NewGeneratorWithPosts(postFixtures, time.Time{})
-
 	dir := os.TempDir()
 
 	folderName := path.Join(dir, "it-was-a-riot")
@@ -197,22 +200,47 @@ func TestGenerator_GeneratePostsHTMLWithFolderCreated(t *testing.T) {
 
 	err := g.GeneratePostsHTML(dir, "")
 	ok(t, err)
-
 }
 
-func teardownFolders(dir string) {
-	dirNames := []string{"it-was-a-riot", "the-world-tree", "fade-away-love"}
+// Test generating a post when a previously generated post is now made a draft
+// That post should be deleted
+func TestGenerator_GeneratePostsHTMLWithDraftCreated(t *testing.T) {
+	g := goblawg.NewGeneratorWithPosts(postFixtures, time.Time{})
+	dir := os.TempDir()
+
+	_ = g.GeneratePostsHTML(dir, "")
 	fileInfoList, _ := ioutil.ReadDir(dir)
-	for _, f := range fileInfoList {
-		if f.IsDir() {
-			for _, name := range dirNames {
-				if name == f.Name() {
-					tmpPath := path.Join(dir, name)
-					os.RemoveAll(tmpPath)
-				}
+	filteredList := filterDir(fileInfoList, func(fi os.FileInfo) bool {
+		dirNames := []string{"it-was-a-riot", "the-world-tree", "fade-away-love"}
+		for _, name := range dirNames {
+			if fi.Name() == name {
+				return true
 			}
 		}
-	}
+		return false
+	})
+
+	// Teardown
+	defer teardownFolders(dir)
+
+	assert(t, len(filteredList) == 3, "Expect generated posts to be 3, got %v", len(filteredList))
+
+	postFixtures[2].IsDraft = true
+	g = goblawg.NewGeneratorWithPosts(postFixtures, time.Time{})
+	_ = g.GeneratePostsHTML(dir, "")
+	fileInfoList, _ = ioutil.ReadDir(dir)
+
+	filteredList = filterDir(fileInfoList, func(fi os.FileInfo) bool {
+		dirNames := []string{"it-was-a-riot", "the-world-tree", "fade-away-love"}
+		for _, name := range dirNames {
+			if fi.Name() == name {
+				return true
+			}
+		}
+		return false
+	})
+
+	assert(t, len(filteredList) == 2, "Expect generated posts to be 2, after one was made draft, got %v", len(filteredList))
 }
 
 // Helpers
@@ -242,5 +270,30 @@ func generator_teardown(dir string, generatedDirs []os.FileInfo) {
 	for _, tmpDir := range generatedDirs {
 		tempPath := path.Join(dir, tmpDir.Name())
 		os.RemoveAll(tempPath)
+	}
+}
+
+func filterDir(fiList []os.FileInfo, fn func(fi os.FileInfo) bool) []os.FileInfo {
+	var res []os.FileInfo
+	for _, fi := range fiList {
+		if fn(fi) {
+			res = append(res, fi)
+		}
+	}
+	return res
+}
+
+func teardownFolders(dir string) {
+	dirNames := []string{"it-was-a-riot", "the-world-tree", "fade-away-love"}
+	fileInfoList, _ := ioutil.ReadDir(dir)
+	for _, f := range fileInfoList {
+		if f.IsDir() {
+			for _, name := range dirNames {
+				if name == f.Name() {
+					tmpPath := path.Join(dir, name)
+					os.RemoveAll(tmpPath)
+				}
+			}
+		}
 	}
 }
