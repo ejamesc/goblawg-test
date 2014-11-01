@@ -8,10 +8,16 @@ import (
 	"path"
 	"strings"
 	"time"
+
+	"github.com/gorilla/feeds"
 )
 
 type Blog struct {
 	Name         string
+	Link         string
+	Description  string
+	Author       string
+	Email        string
 	Posts        []*Post
 	InDir        string
 	OutDir       string
@@ -19,10 +25,14 @@ type Blog struct {
 }
 
 type config struct {
-	Name    string
-	InDir   string
-	OutDir  string
-	LastGen string
+	Name        string
+	InDir       string
+	OutDir      string
+	LastGen     string
+	Link        string
+	Description string
+	Author      string
+	Email       string
 }
 
 func NewBlog(settingsJSON string) (*Blog, error) {
@@ -48,8 +58,12 @@ func NewBlog(settingsJSON string) (*Blog, error) {
 	b.Name = c.Name
 	b.Posts = posts
 	b.InDir = c.InDir
-	b.LastModified = tts
 	b.OutDir = c.OutDir
+	b.LastModified = tts
+	b.Link = c.Link
+	b.Description = c.Description
+	b.Author = c.Author
+	b.Email = c.Email
 
 	return b, nil
 }
@@ -75,9 +89,21 @@ func (b *Blog) SavePost(post *Post) error {
 	return nil
 }
 
+// Return all published posts, sorted in reverse chronological order
+// TODO: Implement the actual sorting
+func (b *Blog) GetPublishedPosts() []*Post {
+	ps := []*Post{}
+	for _, p := range b.Posts {
+		if !p.IsDraft {
+			ps = append(ps, p)
+		}
+	}
+	return ps
+}
+
 // Generate the entire blog
 // TODO: Copy over non-blog components
-func (b *Blog) GenerateHTML() error {
+func (b *Blog) GenerateSite() error {
 	g := NewGeneratorWithPosts(b.Posts, b.LastModified)
 
 	err := g.GeneratePostsHTML(b.OutDir, "")
@@ -86,6 +112,48 @@ func (b *Blog) GenerateHTML() error {
 	}
 
 	b.LastModified = time.Now()
+
+	return nil
+}
+
+// Generate the RSS feed
+func (b *Blog) generateRSS() error {
+	feed := &feeds.Feed{
+		Title:       b.Name,
+		Link:        &feeds.Link{Href: b.Link},
+		Description: b.Description,
+		Author:      &feeds.Author{b.Author, b.Email},
+		Created:     time.Now(),
+	}
+
+	feed.Items = []*feeds.Item{}
+	for _, p := range b.GetPublishedPosts() {
+		f := &feeds.Item{
+			Title:       p.Title,
+			Link:        &feeds.Link{Href: "None"}, // TODO
+			Description: string(p.Body[:120]) + "...",
+			Created:     p.Time,
+		}
+		feed.Items = append(feed.Items, f)
+	}
+
+	atom, err := feed.ToAtom()
+	if err != nil {
+		return err
+	}
+	rss, err := feed.ToRss()
+	if err != nil {
+		return err
+	}
+
+	err = ioutil.WriteFile(path.Join(b.OutDir, "rss"), []byte(rss), 0776)
+	if err != nil {
+		return err
+	}
+	err = ioutil.WriteFile(path.Join(b.OutDir, "atom.xml"), []byte(atom), 0776)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }

@@ -17,7 +17,15 @@ func TestNewBlog(t *testing.T) {
 	dir := os.TempDir()
 	path, fi := setup(dir, "")
 	post, _ := goblawg.NewPostFromFile(path, fi)
-	settingsJSON := fmt.Sprintf(`{"Name": "My First Blog", "OutDir": "%s", "InDir": "%s", "LastGen": "12-Jan-2014-15-05-02"}`, dir, dir)
+	settingsJSON := fmt.Sprintf(
+		`{"Name": "My First Blog", 
+	"OutDir": "%s", 
+	"InDir": "%s", 
+	"LastGen": "12-Jan-2014-15-05-02",
+	"Link": "http://elijames.org",
+	"Description": "Test Blog",
+	"Author": "Eli James",
+	"Email": "bob@test.com"}`, dir, dir)
 
 	postList := []*goblawg.Post{post}
 	testTime, _ := time.Parse(layout, "12-Jan-2014-15-05-02")
@@ -77,13 +85,13 @@ func TestSavePost(t *testing.T) {
 }
 
 // Test Generate HTML
-func TestGenerateHTML(t *testing.T) {
+func TestGenerateSite(t *testing.T) {
 	// Setup
 	dir := os.TempDir()
 	post := &goblawg.Post{"The Shining", bodyBytes, time.Now(), false, time.Now()}
 
 	b := &goblawg.Blog{Posts: []*goblawg.Post{post}, LastModified: time.Time{}, OutDir: dir}
-	err := b.GenerateHTML()
+	err := b.GenerateSite()
 
 	// Teardown
 	generatedPath := path.Join(dir, "the-shining")
@@ -97,3 +105,8 @@ func TestGenerateHTML(t *testing.T) {
 	ok(t, err1)
 	ok(t, err2)
 }
+
+// Test that GetPosts returns a reverse chronological list of posts
+//func TestGetPosts(t *testing.T) {
+//	d
+//}
