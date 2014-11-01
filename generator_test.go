@@ -166,15 +166,16 @@ func TestGenerator_GeneratePostsHTMLAfterDateModified(t *testing.T) {
 	err := g.GeneratePostsHTML(dir, "")
 
 	fileInfoList, _ := ioutil.ReadDir(dir)
-	dirNames := []string{"it-was-a-riot", "the-world-tree", "fade-away-love"}
-	var directories []os.FileInfo
-	for _, fi := range fileInfoList {
+	directories := filterDir(fileInfoList, func(fi os.FileInfo) bool {
+		dirNames := []string{"it-was-a-riot", "the-world-tree", "fade-away-love"}
 		for _, name := range dirNames {
 			if fi.Name() == name {
-				directories = append(directories, fi)
+				return true
 			}
 		}
-	}
+		return false
+	})
+
 	// Teardown
 	defer generator_teardown(dir, directories)
 
@@ -186,7 +187,7 @@ func TestGenerator_GeneratePostsHTMLAfterDateModified(t *testing.T) {
 	assert(t, fileExistsErr != nil, "Generator generates fade-away-love/index.html, when it should not")
 }
 
-// Test generating a post with a folder already created doesn't return an error
+// Test that generating a post with a folder already created, doesn't return an error
 func TestGenerator_GeneratePostsHTMLWithFolderCreated(t *testing.T) {
 	g := goblawg.NewGeneratorWithPosts(postFixtures, time.Time{})
 	dir := os.TempDir()

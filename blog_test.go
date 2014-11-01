@@ -80,10 +80,9 @@ func TestSavePost(t *testing.T) {
 func TestGenerateHTML(t *testing.T) {
 	// Setup
 	dir := os.TempDir()
-	tts, _ := time.Parse(layout, "21-Oct-2013-14-06-10")
 	post := &goblawg.Post{"The Shining", bodyBytes, time.Now(), false, time.Now()}
 
-	b := &goblawg.Blog{Posts: []*goblawg.Post{post}, LastModified: tts, OutDir: dir}
+	b := &goblawg.Blog{Posts: []*goblawg.Post{post}, LastModified: time.Time{}, OutDir: dir}
 	err := b.GenerateHTML()
 
 	// Teardown
@@ -91,7 +90,7 @@ func TestGenerateHTML(t *testing.T) {
 	defer os.RemoveAll(generatedPath)
 
 	ok(t, err)
-	assert(t, b.LastModified != tts, "Expected last modified timestamp to have been updated")
+	assert(t, b.LastModified != time.Time{}, "Expected last modified timestamp to have been updated")
 
 	_, err1 := os.Stat(generatedPath)
 	_, err2 := os.Stat(path.Join(generatedPath, "index.html"))
