@@ -106,6 +106,11 @@ func (b *Blog) GenerateSite() error {
 		return err
 	}
 
+	err = b.generateRSS()
+	if err != nil {
+		return err
+	}
+
 	b.LastModified = time.Now()
 
 	return nil
@@ -123,10 +128,14 @@ func (b *Blog) generateRSS() error {
 
 	feed.Items = []*feeds.Item{}
 	for _, p := range b.GetPublishedPosts() {
+		desc := string(p.Body)
+		if len(desc) > 120 {
+			desc = desc[:120] + "..."
+		}
 		f := &feeds.Item{
 			Title:       p.Title,
 			Link:        &feeds.Link{Href: "None"}, // TODO
-			Description: string(p.Body[:120]) + "...",
+			Description: desc,
 			Created:     p.Time,
 		}
 		feed.Items = append(feed.Items, f)

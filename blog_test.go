@@ -117,3 +117,41 @@ func TestGetPublishedPosts(t *testing.T) {
 	orderedPostList := []*goblawg.Post{postFixtures[0], postFixtures[2], postFixtures[1]}
 	equals(t, posts, orderedPostList)
 }
+
+// Test the RSS and atom feeds are generated.
+func TestGenerateRSS(t *testing.T) {
+	dir := os.TempDir()
+	settingsJSON := fmt.Sprintf(
+		`{"Name": "My First Blog", 
+	"OutDir": "%s", 
+	"InDir": "%s", 
+	"LastGen": "12-Jan-2014-15-05-02",
+	"Link": "http://elijames.org",
+	"Description": "Test Blog",
+	"Author": "Eli James",
+	"Email": "bob@test.com"}`, dir, dir)
+
+	b, _ := goblawg.NewBlog(settingsJSON)
+	b.Posts = postFixtures
+	// Test truncation of post description
+	b.Posts[0].Body = []byte("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.")
+	err := b.GenerateSite()
+
+	defer func() {
+		teardown(path.Join(dir, "feed.rss"))
+		teardownFolders(dir)
+	}()
+
+	ok(t, err)
+
+	fiList, _ := ioutil.ReadDir(dir)
+	filteredList := filterDir(fiList, func(fi os.FileInfo) bool {
+		if fi.Name() == "feed.rss" {
+			return true
+		}
+		return false
+	})
+
+	assert(t, len(filteredList) == 1, "Boo, feed.rss wasn't generated")
+	assert(t, filteredList[0].Size() > 0, "feed.rss appears to be empty!")
+}
