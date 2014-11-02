@@ -13,7 +13,6 @@ import (
 	"github.com/gorilla/feeds"
 )
 
-// TODO: Refactor this, too many fields
 type Blog struct {
 	Name         string
 	Link         string
@@ -26,27 +25,25 @@ type Blog struct {
 	LastModified time.Time
 }
 
-type config struct {
-	Name        string
-	InDir       string
-	OutDir      string
-	LastGen     string
-	Link        string
-	Description string
-	Author      string
-	Email       string
-}
-
 func NewBlog(settingsJSON string) (*Blog, error) {
 	dec := json.NewDecoder(strings.NewReader(settingsJSON))
-	var c config
+	var b *Blog
 
-	err := dec.Decode(&c)
+	err := dec.Decode(&b)
 	if err != nil && err != io.EOF {
 		return nil, err
 	}
 
-	posts, err := loadPostsFromDir(c.InDir)
+	b.Posts, err = loadPostsFromDir(b.InDir)
+	if err != nil {
+		return nil, err
+	}
+
+	type timeDecode struct {
+		LastGen string
+	}
+	var c timeDecode
+	err = json.Unmarshal([]byte(settingsJSON), &c)
 	if err != nil {
 		return nil, err
 	}
@@ -55,17 +52,7 @@ func NewBlog(settingsJSON string) (*Blog, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	b := &Blog{}
-	b.Name = c.Name
-	b.Posts = posts
-	b.InDir = c.InDir
-	b.OutDir = c.OutDir
 	b.LastModified = tts
-	b.Link = c.Link
-	b.Description = c.Description
-	b.Author = c.Author
-	b.Email = c.Email
 
 	return b, nil
 }
@@ -145,20 +132,12 @@ func (b *Blog) generateRSS() error {
 		feed.Items = append(feed.Items, f)
 	}
 
-	atom, err := feed.ToAtom()
-	if err != nil {
-		return err
-	}
 	rss, err := feed.ToRss()
 	if err != nil {
 		return err
 	}
 
-	err = ioutil.WriteFile(path.Join(b.OutDir, "rss"), []byte(rss), 0776)
-	if err != nil {
-		return err
-	}
-	err = ioutil.WriteFile(path.Join(b.OutDir, "atom.xml"), []byte(atom), 0776)
+	err = ioutil.WriteFile(path.Join(b.OutDir, "feed.rss"), []byte(rss), 0776)
 	if err != nil {
 		return err
 	}
