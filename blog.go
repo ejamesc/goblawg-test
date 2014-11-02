@@ -6,12 +6,14 @@ import (
 	"io/ioutil"
 	"os"
 	"path"
+	"sort"
 	"strings"
 	"time"
 
 	"github.com/gorilla/feeds"
 )
 
+// TODO: Refactor this, too many fields
 type Blog struct {
 	Name         string
 	Link         string
@@ -89,8 +91,13 @@ func (b *Blog) SavePost(post *Post) error {
 	return nil
 }
 
+type ByTime []*Post
+
+func (t ByTime) Len() int           { return len(t) }
+func (t ByTime) Swap(i, j int)      { t[i], t[j] = t[j], t[i] }
+func (t ByTime) Less(i, j int) bool { return t[i].Time.Before(t[j].Time) }
+
 // Return all published posts, sorted in reverse chronological order
-// TODO: Implement the actual sorting
 func (b *Blog) GetPublishedPosts() []*Post {
 	ps := []*Post{}
 	for _, p := range b.Posts {
@@ -98,6 +105,7 @@ func (b *Blog) GetPublishedPosts() []*Post {
 			ps = append(ps, p)
 		}
 	}
+	sort.Sort(sort.Reverse(ByTime(ps)))
 	return ps
 }
 

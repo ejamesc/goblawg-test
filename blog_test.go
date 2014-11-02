@@ -107,6 +107,13 @@ func TestGenerateSite(t *testing.T) {
 }
 
 // Test that GetPosts returns a reverse chronological list of posts
-//func TestGetPosts(t *testing.T) {
-//	d
-//}
+func TestGetPublishedPosts(t *testing.T) {
+	postFixtures[1].Time = timeWayBefore
+	postFixtures[2].Time = timeBefore
+
+	b := &goblawg.Blog{Posts: postFixtures}
+	posts := b.GetPublishedPosts()
+
+	orderedPostList := []*goblawg.Post{postFixtures[0], postFixtures[2], postFixtures[1]}
+	equals(t, posts, orderedPostList)
+}
