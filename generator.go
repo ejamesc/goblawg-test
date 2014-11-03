@@ -106,7 +106,7 @@ func (g *Generator) GeneratePostsHTML(outDir, templateLoc string) error {
 // Create a new post from file
 func NewPostFromFile(path string, fi os.FileInfo) (*Post, error) {
 	if !isMarkdownFile(path) {
-		return nil, fmt.Errorf("%s does not have a markdown or text file extension.", path)
+		return nil, fmt.Errorf("%s does not have a markdown or text file extension", path)
 	}
 
 	p := &Post{}

@@ -2,6 +2,8 @@ package goblawg
 
 import (
 	"encoding/json"
+	"fmt"
+	"html/template"
 	"io"
 	"io/ioutil"
 	"os"
@@ -34,6 +36,7 @@ func NewBlog(settingsJSON string) (*Blog, error) {
 		return nil, err
 	}
 
+	// TODO: read from /blog/
 	b.Posts, err = loadPostsFromDir(b.InDir)
 	if err != nil {
 		return nil, err
@@ -97,7 +100,7 @@ func (b *Blog) GetPublishedPosts() []*Post {
 }
 
 // Generate the entire blog
-// TODO: Copy over non-blog components
+// TODO: Put all generation in go routines
 func (b *Blog) GenerateSite() error {
 	g := NewGeneratorWithPosts(b.Posts, b.LastModified)
 
@@ -107,6 +110,11 @@ func (b *Blog) GenerateSite() error {
 	}
 
 	err = b.generateRSS()
+	if err != nil {
+		return err
+	}
+
+	err = b.GenerateSite()
 	if err != nil {
 		return err
 	}
@@ -149,6 +157,38 @@ func (b *Blog) generateRSS() error {
 	err = ioutil.WriteFile(path.Join(b.OutDir, "feed.rss"), []byte(rss), 0776)
 	if err != nil {
 		return err
+	}
+
+	return nil
+}
+
+// Generate the rest of the templates that isn't the blog
+func (b *Blog) generateSitePages() error {
+	fil, err := ioutil.ReadDir(b.InDir)
+	if err != nil {
+		return err
+	}
+
+	for _, fi := range fil {
+		if path.Ext(fi.Name()) == ".html" {
+			t, err := template.ParseFiles(path.Join(b.InDir, fi.Name()))
+			if err != nil {
+				return err
+			}
+
+			name := strings.Split(fi.Name(), ".")
+			if len(name) != 2 {
+				return fmt.Errorf("%s is a bad filename, expected x.html", fi.Name())
+			}
+
+			oPath := path.Join(b.OutDir, name[0], "index.html")
+			f, err := os.OpenFile(oPath, os.O_RDWR|os.O_CREATE, 0776)
+			if err != nil {
+				return err
+			}
+
+			t.Execute(f, b)
+		}
 	}
 
 	return nil
