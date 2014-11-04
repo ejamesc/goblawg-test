@@ -11,21 +11,22 @@ import (
 	"github.com/ejamesc/goblawg"
 )
 
-// Test NewBlog constructs and returns a Blog struct correctly
-func TestNewBlog(t *testing.T) {
-	// Setup
-	dir := os.TempDir()
-	path, fi := setup(dir, "")
-	post, _ := goblawg.NewPostFromFile(path, fi)
-	settingsJSON := fmt.Sprintf(
-		`{"Name": "My First Blog", 
+var tmpdir = os.TempDir()
+var settingsJSON = fmt.Sprintf(
+	`{"Name": "My First Blog", 
 	"OutDir": "%s", 
 	"InDir": "%s", 
 	"LastGen": "12-Jan-2014-15-05-02",
 	"Link": "http://elijames.org",
 	"Description": "Test Blog",
 	"Author": "Eli James",
-	"Email": "bob@test.com"}`, dir, dir)
+	"Email": "bob@test.com"}`, tmpdir, tmpdir)
+
+// Test NewBlog constructs and returns a Blog struct correctly
+func TestNewBlog(t *testing.T) {
+	// Setup
+	path, fi := setup(tmpdir, "")
+	post, _ := goblawg.NewPostFromFile(path, fi)
 
 	postList := []*goblawg.Post{post}
 	testTime, _ := time.Parse(layout, "12-Jan-2014-15-05-02")
@@ -38,8 +39,8 @@ func TestNewBlog(t *testing.T) {
 	ok(t, err)
 
 	equals(t, b.Name, "My First Blog")
-	equals(t, b.OutDir, dir)
-	equals(t, b.InDir, dir)
+	equals(t, b.OutDir, tmpdir)
+	equals(t, b.InDir, tmpdir)
 	equals(t, b.Posts, postList)
 	equals(t, b.LastModified, testTime)
 }
@@ -90,7 +91,7 @@ func TestGenerateSite(t *testing.T) {
 	dir := os.TempDir()
 	post := &goblawg.Post{"The Shining", bodyBytes, time.Now(), false, time.Now()}
 
-	b := &goblawg.Blog{Posts: []*goblawg.Post{post}, LastModified: time.Time{}, OutDir: dir}
+	b := &goblawg.Blog{Posts: []*goblawg.Post{post}, LastModified: time.Time{}, InDir: dir, OutDir: dir}
 	err := b.GenerateSite()
 
 	// Teardown
@@ -120,31 +121,17 @@ func TestGetPublishedPosts(t *testing.T) {
 
 // Test the RSS and atom feeds are generated.
 func TestGenerateRSS(t *testing.T) {
-	dir := os.TempDir()
-	settingsJSON := fmt.Sprintf(
-		`{"Name": "My First Blog", 
-	"OutDir": "%s", 
-	"InDir": "%s", 
-	"LastGen": "12-Jan-2014-15-05-02",
-	"Link": "http://elijames.org",
-	"Description": "Test Blog",
-	"Author": "Eli James",
-	"Email": "bob@test.com"}`, dir, dir)
-
 	b, _ := goblawg.NewBlog(settingsJSON)
 	b.Posts = postFixtures
 	// Test truncation of post description
 	b.Posts[0].Body = []byte("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.")
-	err := b.GenerateSite()
+	err := b.GenerateRSS()
 
-	defer func() {
-		teardown(path.Join(dir, "feed.rss"))
-		teardownFolders(dir)
-	}()
+	defer teardown(path.Join(tmpdir, "feed.rss"))
 
 	ok(t, err)
 
-	fiList, _ := ioutil.ReadDir(dir)
+	fiList, _ := ioutil.ReadDir(tmpdir)
 	filteredList := filterDir(fiList, func(fi os.FileInfo) bool {
 		if fi.Name() == "feed.rss" {
 			return true
@@ -154,4 +141,26 @@ func TestGenerateRSS(t *testing.T) {
 
 	assert(t, len(filteredList) == 1, "Boo, feed.rss wasn't generated")
 	assert(t, filteredList[0].Size() > 0, "feed.rss appears to be empty!")
+}
+
+// Ensure that the rest of the site is generated perfectly
+func testGeneratingSitePages(t *testing.T) {
+	// Setup
+	b, _ := goblawg.NewBlog(settingsJSON)
+	aPath := path.Join(b.InDir, "about.html")
+	ioutil.WriteFile(aPath, bodyBytes, 0775)
+
+	err := b.GenerateSitePages()
+
+	// Teardown
+	defer func() {
+		os.Remove(aPath)
+		os.RemoveAll(path.Join(b.OutDir, "about"))
+	}()
+
+	ok(t, err)
+
+	fi, err := os.Stat(path.Join(b.OutDir, "about"))
+	assert(t, err == nil, "Error with generation of about/index.html: %s", err)
+	assert(t, fi.IsDir() == true, "Expected about/ to be a folder, but got a file.")
 }

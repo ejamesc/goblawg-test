@@ -109,12 +109,12 @@ func (b *Blog) GenerateSite() error {
 		return err
 	}
 
-	err = b.generateRSS()
+	err = b.GenerateRSS()
 	if err != nil {
 		return err
 	}
 
-	err = b.GenerateSite()
+	err = b.GenerateSitePages()
 	if err != nil {
 		return err
 	}
@@ -125,7 +125,7 @@ func (b *Blog) GenerateSite() error {
 }
 
 // Generate the RSS feed
-func (b *Blog) generateRSS() error {
+func (b *Blog) GenerateRSS() error {
 	feed := &feeds.Feed{
 		Title:       b.Name,
 		Link:        &feeds.Link{Href: b.Link},
@@ -163,7 +163,7 @@ func (b *Blog) generateRSS() error {
 }
 
 // Generate the rest of the templates that isn't the blog
-func (b *Blog) generateSitePages() error {
+func (b *Blog) GenerateSitePages() error {
 	fil, err := ioutil.ReadDir(b.InDir)
 	if err != nil {
 		return err
