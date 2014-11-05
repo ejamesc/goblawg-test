@@ -23,6 +23,7 @@ type Generator struct {
 type Post struct {
 	Title        string
 	Body         []byte
+	Link         string
 	Time         time.Time
 	IsDraft      bool
 	LastModified time.Time
@@ -131,7 +132,11 @@ func NewPostFromFile(path string, fi os.FileInfo) (*Post, error) {
 
 	filename := filenameParts[3]
 	filename_parts := strings.Split(filename, ".")
+	link := filename_parts[0]
+	link = strings.Replace(link, "_", "-", -1)
+	p.Link = link
 	title := strings.Replace(filename_parts[0], "-", " ", -1)
+	title = strings.Replace(title, "_", " ", -1)
 	p.Title = strings.Title(title)
 
 	body, err := ioutil.ReadFile(path)

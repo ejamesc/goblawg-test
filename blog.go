@@ -142,7 +142,7 @@ func (b *Blog) GenerateRSS() error {
 		}
 		f := &feeds.Item{
 			Title:       p.Title,
-			Link:        &feeds.Link{Href: "None"}, // TODO
+			Link:        &feeds.Link{Href: b.Link + "/" + p.Link + "/"},
 			Description: desc,
 			Created:     p.Time,
 		}

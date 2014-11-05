@@ -54,7 +54,7 @@ func TestNewPostFromFile(t *testing.T) {
 
 	tts, _ := time.Parse(layout, "2-Oct-2014-15-04-06")
 
-	expected := &goblawg.Post{"It Was A Riot", bodyBytes, tts, false, fi.ModTime()}
+	expected := &goblawg.Post{"It Was A Riot", bodyBytes, "it-was-a-riot", tts, false, fi.ModTime()}
 	equals(t, expected, p)
 	equals(t, "2 Oct 2014, 15:04:06", p.Time.Format(layout2))
 }
@@ -107,10 +107,10 @@ var timeBefore = time.Now().Add(-20 * time.Minute)
 var timeWayBefore = time.Now().Add(-40 * time.Minute)
 
 var postFixtures = []*goblawg.Post{
-	&goblawg.Post{"It Was A Riot", bodyBytes, time.Now(), false, timeNow},
-	&goblawg.Post{"The World Tree", bodyBytes, time.Now(), false, timeNow},
-	&goblawg.Post{"Fade Away Love", bodyBytes, time.Now(), false, timeWayBefore},
-	&goblawg.Post{"Blah blah test", bodyBytes, time.Now(), true, timeNow},
+	&goblawg.Post{"It Was A Riot", bodyBytes, "it-was-a-riot", time.Now(), false, timeNow},
+	&goblawg.Post{"The World Tree", bodyBytes, "the-world-tree", time.Now(), false, timeNow},
+	&goblawg.Post{"Fade Away Love", bodyBytes, "fade-away-love", time.Now(), false, timeWayBefore},
+	&goblawg.Post{"Blah blah test", bodyBytes, "blah-blah-test", time.Now(), true, timeNow},
 }
 
 // Test that we can create a Generator with a given list of posts

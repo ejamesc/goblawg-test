@@ -56,7 +56,7 @@ func TestSavePost(t *testing.T) {
 	currTime := time.Now()
 
 	post1, _ := goblawg.NewPostFromFile(testPath, fi)
-	post2 := &goblawg.Post{"The Shining", bodyBytes, tts, true, currTime}
+	post2 := &goblawg.Post{"The Shining", bodyBytes, "the-shining", tts, true, currTime}
 
 	postListBefore := []*goblawg.Post{post1}
 	postListAfter := []*goblawg.Post{post1, post2}
@@ -89,7 +89,7 @@ func TestSavePost(t *testing.T) {
 func TestGenerateSite(t *testing.T) {
 	// Setup
 	dir := os.TempDir()
-	post := &goblawg.Post{"The Shining", bodyBytes, time.Now(), false, time.Now()}
+	post := &goblawg.Post{"The Shining", bodyBytes, "the-shining", time.Now(), false, time.Now()}
 
 	b := &goblawg.Blog{Posts: []*goblawg.Post{post}, LastModified: time.Time{}, InDir: dir, OutDir: dir}
 	err := b.GenerateSite()
