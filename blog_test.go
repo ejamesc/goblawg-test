@@ -56,7 +56,7 @@ func TestSavePost(t *testing.T) {
 	currTime := time.Now()
 
 	post1, _ := goblawg.NewPostFromFile(testPath, fi)
-	post2 := &goblawg.Post{"The Shining", bodyBytes, "the-shining", tts, true, currTime}
+	post2 := &goblawg.Post{"The Shining", []byte("<p>Hello world, this is my first post</p>\n"), "the-shining", tts, true, currTime}
 
 	postListBefore := []*goblawg.Post{post1}
 	postListAfter := []*goblawg.Post{post1, post2}
