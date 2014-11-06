@@ -2,12 +2,12 @@ package goblawg
 
 import (
 	"fmt"
+	"html/template"
 	"io/ioutil"
 	"os"
 	"path"
 	"regexp"
 	"strings"
-	"text/template"
 	"time"
 
 	"github.com/russross/blackfriday"
@@ -99,7 +99,13 @@ func (g *Generator) GeneratePostsHTML(outDir, templateLoc string) error {
 				return err
 			}
 
-			t.Execute(file, post)
+			pr := struct {
+				Title string
+				Body  template.HTML
+				Time  time.Time
+			}{post.Title, template.HTML(post.Body), post.Time}
+
+			t.Execute(file, pr)
 		}
 	}
 
