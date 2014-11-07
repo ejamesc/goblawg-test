@@ -25,7 +25,9 @@ var settingsJSON = fmt.Sprintf(
 // Test NewBlog constructs and returns a Blog struct correctly
 func TestNewBlog(t *testing.T) {
 	// Setup
-	path, fi := setup(tmpdir, "")
+	blogpath := path.Join(tmpdir, "posts")
+	os.Mkdir(blogpath, 0775)
+	path, fi := setup(blogpath, "")
 	post, _ := goblawg.NewPostFromFile(path, fi)
 
 	postList := []*goblawg.Post{post}
@@ -34,7 +36,7 @@ func TestNewBlog(t *testing.T) {
 	b, err := goblawg.NewBlog(settingsJSON)
 
 	// Teardown
-	defer teardown(path)
+	defer os.RemoveAll(blogpath)
 
 	ok(t, err)
 
@@ -121,13 +123,18 @@ func TestGetPublishedPosts(t *testing.T) {
 
 // Test the RSS and atom feeds are generated.
 func TestGenerateRSS(t *testing.T) {
+	os.Mkdir(path.Join(tmpdir, "posts"), 0775)
+
 	b, _ := goblawg.NewBlog(settingsJSON)
 	b.Posts = postFixtures
 	// Test truncation of post description
 	b.Posts[0].Body = []byte("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.")
 	err := b.GenerateRSS()
 
-	defer teardown(path.Join(tmpdir, "feed.rss"))
+	defer func() {
+		teardown(path.Join(tmpdir, "feed.rss"))
+		os.RemoveAll(path.Join(tmpdir, "blog"))
+	}()
 
 	ok(t, err)
 

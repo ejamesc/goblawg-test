@@ -12,19 +12,6 @@ import (
 	"github.com/russross/blackfriday"
 )
 
-/*
- * Structs
- */
-type Post struct {
-	Title string
-	Body  []byte
-}
-
-type Content struct {
-	Title template.HTML
-	Body  template.HTML
-}
-
 func (p *Post) save() error {
 	//const layout = "2 Jan 2006 "
 	//t := time.Now()

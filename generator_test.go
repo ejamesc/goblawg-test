@@ -253,7 +253,9 @@ func setup(pathname, filename string) (string, os.FileInfo) {
 
 	resPath := ""
 	if pathname == "" {
-		resPath = path.Join(os.TempDir(), filename)
+		blogpath := path.Join(os.TempDir(), "blog")
+		os.Mkdir(blogpath, 0775)
+		resPath = path.Join(blogpath, filename)
 	} else {
 		resPath = path.Join(pathname, filename)
 	}

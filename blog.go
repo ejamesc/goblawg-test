@@ -36,8 +36,7 @@ func NewBlog(settingsJSON string) (*Blog, error) {
 		return nil, err
 	}
 
-	// TODO: read from /blog/
-	b.Posts, err = loadPostsFromDir(b.InDir)
+	b.Posts, err = loadPostsFromDir(path.Join(b.InDir, "posts"))
 	if err != nil {
 		return nil, err
 	}
