@@ -3,7 +3,7 @@
  */
 
 body {
-  font-family: 'adelle', Georgia, serif;
+  font-family: 'calluna', Georgia, serif;
 }
 
 p, li { 
@@ -16,7 +16,7 @@ p, li {
 h1, h2, h3, h4, h5 { font-family: 'adelle', Georgia, serif; }
 
 header {
-  padding: 40px 0;
+  padding: 30px 0;
 }
 
 header h1 {
@@ -25,7 +25,33 @@ header h1 {
 }
 
 .posts-list {
-  border-left: 1px solid #ccc;
+  border-right: 1px solid #ccc;
   height: 100%;
 }
 
+.posts-list ul { padding-left: 0; margin-left: 0; }
+
+.posts-list li {
+  display: block;
+  list-style: none;
+  padding: 10px 10px 10px 0;
+  border-bottom: 1px solid #ddd;
+}
+
+.posts-list li h3 {
+  display: inline-block;
+}
+
+.posts-list li h3 a {
+  color: #333; 
+  font-size: 2.3rem;
+}
+
+.posts-list li h3 a:hover { color: #005a88; }
+
+.post-actions {
+  float: right;
+  margin-top: 1.5rem;
+}
+
+h2 { font-size: 1.4rem; }
