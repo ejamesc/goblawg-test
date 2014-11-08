@@ -1,0 +1,31 @@
+/* Admin styles 
+ * Can I be messy with this because nobody's watching? :P
+ */
+
+body {
+  font-family: 'adelle', Georgia, serif;
+}
+
+p, li { 
+  color: rgba(0, 0, 0, 0.8);
+  line-height: 140%; 
+  font-size: 1.25rem; 
+  font-family: 'calluna', Georgia, serif; 
+}
+
+h1, h2, h3, h4, h5 { font-family: 'adelle', Georgia, serif; }
+
+header {
+  padding: 40px 0;
+}
+
+header h1 {
+  font-size: 1.2rem;
+  color: #aaa;
+}
+
+.posts-list {
+  border-left: 1px solid #ccc;
+  height: 100%;
+}
+
