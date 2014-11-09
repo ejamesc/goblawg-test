@@ -14,6 +14,7 @@ p, li {
 }
 
 h1, h2, h3, h4, h5 { font-family: 'adelle', Georgia, serif; }
+h2 { font-size: 1.4rem; }
 
 header {
   padding: 30px 0;
@@ -22,10 +23,32 @@ header {
 header h1 {
   font-size: 1.2rem;
   color: #aaa;
+  display: inline-block;
 }
 
+.header-actions {
+  display: inline-block;
+  float: right;
+}
+
+.header-actions img {
+  width: 30px;
+  opacity: 0.4;
+  cursor: pointer;
+}
+.header-actions img:hover {
+  opacity: 1.0; 
+}
+
+.blog-actions {
+  float: right;
+}
+
+.regen-button { background-color: #444; }
+.regen-button:hover { background-color: #888; }
+
+
 .posts-list {
-  border-right: 1px solid #ccc;
   height: 100%;
 }
 
@@ -34,12 +57,14 @@ header h1 {
 .posts-list li {
   display: block;
   list-style: none;
-  padding: 10px 10px 10px 0;
+  padding: 20px 10px 20px 0;
   border-bottom: 1px solid #ddd;
 }
 
 .posts-list li h3 {
   display: inline-block;
+  font-weight: bold;
+  max-width: 80%;
 }
 
 .posts-list li h3 a {
@@ -49,9 +74,38 @@ header h1 {
 
 .posts-list li h3 a:hover { color: #005a88; }
 
-.post-actions {
-  float: right;
-  margin-top: 1.5rem;
+.posts-list h4 {
+  font-style: italic;
+  font-size: 1.1rem;
+  color: #777;
+  margin: 0;
 }
 
-h2 { font-size: 1.4rem; }
+.post-actions {
+  font: 1.05rem Helvetica, Arial, sans-serif;
+}
+
+.post-actions a {
+  margin: 0 0 0 3px;
+  color: #005a88;
+}
+.post-actions a:hover { color: #008cba; }
+
+footer {
+  margin-bottom: 40px;
+}
+
+/* Phones */
+@media only screen {
+  .posts-actions {
+    float: left;
+  }
+}
+
+/* Screens */
+@media only screen and (min-width: 64.063em) {
+  .post-actions {
+    float: right;
+    margin-top: 1.5rem;
+  }
+} /* min-width 1025px, large screens */
