@@ -21,7 +21,7 @@ header {
 }
 
 header h1 {
-  font-size: 1.2rem;
+  font-size: 1.3rem;
   color: #aaa;
   display: inline-block;
 }
@@ -35,13 +35,15 @@ header h1 {
   width: 30px;
   opacity: 0.4;
   cursor: pointer;
+  border: none;
 }
 .header-actions img:hover {
   opacity: 1.0; 
+  border: none;
 }
 
-.blog-actions {
-  float: right;
+.header-actions a {
+  text-decoration: none;
 }
 
 .regen-button { background-color: #444; }
@@ -100,6 +102,10 @@ footer {
   .posts-actions {
     float: left;
   }
+
+  .blog-actions {
+    float: left;
+  }
 }
 
 /* Screens */
@@ -107,5 +113,9 @@ footer {
   .post-actions {
     float: right;
     margin-top: 1.5rem;
+  }
+
+  .blog-actions {
+    float: right;
   }
 } /* min-width 1025px, large screens */
