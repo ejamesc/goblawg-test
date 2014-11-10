@@ -97,11 +97,37 @@ footer {
   margin-bottom: 40px;
 }
 
-/*
- * Login styles
- */
+/* Login styles */
 .login {
   margin-top: 40px;
+}
+
+/* Editor styles */
+textarea:focus, input:focus {
+    outline: none;
+    border-style: none;
+}
+
+input.title-input {
+  background-color: #fff;
+  height: 50px;
+  font-size: 1.4rem;
+  font-weight: bold;
+}
+
+input.title-input:focus { outline:0; }
+
+.editor-container {
+  height: 100%;
+}
+
+.editor {
+  font: 1.2rem "Inconsolata", Courier, monospace;
+  height: 35rem;
+}
+
+.save-details {
+  color: #999;
 }
 
 /* Phones */
