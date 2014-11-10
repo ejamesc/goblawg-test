@@ -46,9 +46,9 @@ header h1 {
   text-decoration: none;
 }
 
-.regen-button { background-color: #444; }
-.regen-button:hover { background-color: #888; }
-
+.blog-actions {
+  float: left;
+}
 
 .posts-list {
   height: 100%;
@@ -97,13 +97,16 @@ footer {
   margin-bottom: 40px;
 }
 
+/*
+ * Login styles
+ */
+.login {
+  margin-top: 40px;
+}
+
 /* Phones */
 @media only screen {
   .posts-actions {
-    float: left;
-  }
-
-  .blog-actions {
     float: left;
   }
 }
@@ -113,9 +116,5 @@ footer {
   .post-actions {
     float: right;
     margin-top: 1.5rem;
-  }
-
-  .blog-actions {
-    float: right;
   }
 } /* min-width 1025px, large screens */
