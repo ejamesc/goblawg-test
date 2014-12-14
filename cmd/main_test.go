@@ -1,1 +1,1 @@
-package goblawg_test
+package main_test
