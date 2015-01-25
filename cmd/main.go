@@ -74,7 +74,11 @@ func adminHandler(rw http.ResponseWriter, req *http.Request) {
 }
 
 func authMiddleware(rw http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
-	next(rw, req)
+	if getUserName(req) == "ejames" {
+		next(rw, req)
+	} else {
+		http.Redirect(rw, req, "/login", 302)
+	}
 }
 
 /* Helpers */
@@ -101,6 +105,16 @@ func clearSession(rw http.ResponseWriter) {
 		MaxAge: -1,
 	}
 	http.SetCookie(rw, cookie)
+}
+
+func getUserName(request *http.Request) (userName string) {
+	if cookie, err := request.Cookie("session"); err == nil {
+		cookieValue := make(map[string]string)
+		if err = cookieHandler.Decode("session", cookie.Value, &cookieValue); err == nil {
+			userName = cookieValue["name"]
+		}
+	}
+	return userName
 }
 
 func standardMiddleware() *negroni.Negroni {
