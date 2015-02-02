@@ -9,11 +9,17 @@ import (
 	"github.com/ejamesc/goblawg"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/securecookie"
+	"github.com/unrolled/render"
 )
 
 var cookieHandler = securecookie.New(
 	securecookie.GenerateRandomKey(64),
 	securecookie.GenerateRandomKey(32))
+
+var rndr = render.New(render.Options{
+	Directory:  "templates",
+	Extensions: []string{".html"},
+})
 
 /*
  * Main Function
@@ -53,15 +59,19 @@ func main() {
 }
 
 func loginHandler(rw http.ResponseWriter, req *http.Request) {
-	name := req.FormValue("name")
-	pass := req.FormValue("password")
-	redirectTarget := "/login"
-	// Just a test
-	if name == "ejames" && pass == "temporary" {
-		setSession(name, rw)
-		redirectTarget = "/admin"
+	if req.Method == "GET" {
+		rndr.HTML(rw, http.StatusOK, "login", nil)
+	} else { // POST
+		name := req.FormValue("name")
+		pass := req.FormValue("password")
+		redirectTarget := "/login"
+		// Just a test
+		if name == "ejames" && pass == "temporary" {
+			setSession(name, rw)
+			redirectTarget = "/admin"
+		}
+		http.Redirect(rw, req, redirectTarget, 302)
 	}
-	http.Redirect(rw, req, redirectTarget, 302)
 }
 
 func logoutHandler(rw http.ResponseWriter, req *http.Request) {
