@@ -43,19 +43,20 @@ func main() {
 	r := mux.NewRouter()
 
 	adminRouter := r.PathPrefix("/admin/").Subrouter()
-	adminRouter.HandleFunc("/", adminHandler)
+	adminRouter.HandleFunc("/newpost", newPostHandler)
 
 	an := negroni.New(negroni.HandlerFunc(authMiddleware))
 	an.UseHandler(adminRouter)
 
 	/* Global Routes */
-	r.Handle("/admin/", an)
+	r.HandleFunc("/admin", adminHandler)
+	r.Handle("/admin/{rest}", an)
 	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/",
 		http.FileServer(http.Dir("/Users/cedric/Projects/gocode/src/github.com/ejamesc/goblawg/static/"))))
 
 	// r.Handle("/", http.FileServer(http.Dir(blog.OutDir)))
-	r.HandleFunc("/login/", loginHandler).Methods("GET", "POST")
-	r.HandleFunc("/logout/", logoutHandler).Methods("POST")
+	r.HandleFunc("/login", loginHandler).Methods("GET", "POST")
+	r.HandleFunc("/logout", logoutHandler).Methods("POST")
 
 	n := standardMiddleware()
 	n.UseHandler(r)
@@ -65,17 +66,17 @@ func main() {
 func loginHandler(rw http.ResponseWriter, req *http.Request) {
 	if req.Method == "GET" {
 		if getUserName(req) == "ejames" {
-			http.Redirect(rw, req, "/admin/", 302)
+			http.Redirect(rw, req, "/admin", 302)
 		}
 		rndr.HTML(rw, http.StatusOK, "login", nil)
 	} else { // POST
 		name := req.FormValue("name")
 		pass := req.FormValue("password")
-		redirectTarget := "/login/"
+		redirectTarget := "/login"
 		// Just a test
 		if name == "ejames" && pass == "temporary" {
 			setSession(name, rw)
-			redirectTarget = "/admin/"
+			redirectTarget = "/admin"
 		}
 		http.Redirect(rw, req, redirectTarget, 302)
 	}
@@ -90,11 +91,15 @@ func adminHandler(rw http.ResponseWriter, req *http.Request) {
 	rndr.HTML(rw, http.StatusOK, "admin", nil)
 }
 
+func newPostHandler(rw http.ResponseWriter, req *http.Request) {
+	fmt.Fprintln(rw, "NEW POST")
+}
+
 func authMiddleware(rw http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
 	if getUserName(req) == "ejames" {
 		next(rw, req)
 	} else {
-		http.Redirect(rw, req, "/login/", 302)
+		http.Redirect(rw, req, "/login", 302)
 	}
 }
 
