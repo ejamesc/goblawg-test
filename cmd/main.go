@@ -64,8 +64,7 @@ func main() {
 
 func loginHandler(rw http.ResponseWriter, req *http.Request) {
 	if req.Method == "GET" {
-		username := getUserName(req)
-		if username == "ejames" {
+		if getUserName(req) == "ejames" {
 			http.Redirect(rw, req, "/admin/", 302)
 		}
 		rndr.HTML(rw, http.StatusOK, "login", nil)
@@ -88,7 +87,7 @@ func logoutHandler(rw http.ResponseWriter, req *http.Request) {
 }
 
 func adminHandler(rw http.ResponseWriter, req *http.Request) {
-	fmt.Fprint(rw, "Hello private world.")
+	rndr.HTML(rw, http.StatusOK, "admin", nil)
 }
 
 func authMiddleware(rw http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
