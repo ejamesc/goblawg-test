@@ -42,15 +42,16 @@ func main() {
 
 	r := mux.NewRouter()
 
-	adminRouter := r.PathPrefix("/admin/").Subrouter()
-	adminRouter.HandleFunc("/newpost", newPostHandler)
-
-	an := negroni.New(negroni.HandlerFunc(authMiddleware))
-	an.UseHandler(adminRouter)
+	adminBase := mux.NewRouter()
+	adminBase.HandleFunc("/admin", adminHandler)
+	r.PathPrefix("/admin").Handler(
+		negroni.New(negroni.HandlerFunc(authMiddleware),
+			negroni.Wrap(adminBase),
+		))
+	admin := adminBase.PathPrefix("/admin").Subrouter()
+	admin.HandleFunc("/new-post", newPostHandler)
 
 	/* Global Routes */
-	r.HandleFunc("/admin", adminHandler)
-	r.Handle("/admin/{rest}", an)
 	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/",
 		http.FileServer(http.Dir("/Users/cedric/Projects/gocode/src/github.com/ejamesc/goblawg/static/"))))
 
@@ -67,6 +68,7 @@ func loginHandler(rw http.ResponseWriter, req *http.Request) {
 	if req.Method == "GET" {
 		if getUserName(req) == "ejames" {
 			http.Redirect(rw, req, "/admin", 302)
+			return
 		}
 		rndr.HTML(rw, http.StatusOK, "login", nil)
 	} else { // POST
