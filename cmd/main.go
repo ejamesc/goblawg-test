@@ -53,7 +53,7 @@ func main() {
 
 	/* Global Routes */
 	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/",
-		http.FileServer(http.Dir("/Users/cedric/Projects/gocode/src/github.com/ejamesc/goblawg/static/"))))
+		http.FileServer(http.Dir("static"))))
 
 	// r.Handle("/", http.FileServer(http.Dir(blog.OutDir)))
 	r.HandleFunc("/login", loginHandler).Methods("GET", "POST")
