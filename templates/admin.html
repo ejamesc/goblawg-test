@@ -16,55 +16,17 @@
   </div>
   <div class='small-12 columns posts-list'>
     <ul>
+      {{ range .Posts }}
       <li>
-      <h4>23 October 2014</h4>
-      <h3><a href='#'>Leverage</a></h3>
+      <h4>{{ .Time }}</h4>
+      <h3><a href='#'>{{ .Title }}</a></h3>
       <div class="post-actions">
-        <span class="label secondary round">Draft</span>
-        <a href="#">view</a>
+        {{ if .IsDraft }}<span class="label secondary round">Draft</span>{{ end }}
+        <a href="{{ .Link }}">view</a>
         <a href='#'>delete</a>
       </div>
       </li>
-      <li>
-      <h4>5 July 2014</h4>
-      <h3><a href='#'>Mega Byte</a></h3>
-      <div class="post-actions">
-        <a href="#">view</a>
-        <a href='#'>delete</a>
-      </div>
-      </li>
-      <li>
-      <h4>4 November 2013</h4>
-      <h3><a href='#'>The Most Important Class I Took in NUS</a></h3>
-      <div class="post-actions">
-        <a href="#">view</a>
-        <a href='#'>delete</a>
-      </div>
-      </li>
-      <li>
-      <h4>31 October 2012</h4>
-      <h3><a href='#'>Actions Speak Louder Than Words</a></h3>
-      <div class="post-actions">
-        <a href="#">view</a>
-        <a href='#'>delete</a>
-      </div>
-      </li>
-      <li>
-      <h4>8 January 2012</h4>
-      <h3><a href='#'>Because Asia</a></h3>
-      <div class="post-actions">
-        <a href="#">view</a>
-        <a href='#'>delete</a>
-      </div>
-      </li>
-      <li>
-      <h4>14 December 2010</h4>
-      <h3><a href='#'>Magical Ideas, Crazy Countries, and Where To Find Them</a></h3>
-      <div class="post-actions">
-        <a href="#">view</a>
-        <a href='#'>delete</a>
-      </div>
-      </li>
+      {{ end }}
     </ul>
   </div>
 </div>

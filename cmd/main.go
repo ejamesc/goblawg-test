@@ -22,6 +22,8 @@ var rndr = render.New(render.Options{
 	Layout:     "base",
 })
 
+var blog *goblawg.Blog
+
 /*
  * Main Function
  */
@@ -32,7 +34,7 @@ func main() {
 		fmt.Println("Error with reading settings: %s", err)
 	}
 
-	_, err = goblawg.NewBlog(string(settings))
+	blog, err = goblawg.NewBlog(string(settings))
 
 	if err != nil {
 		fmt.Printf("Error with creating new blog: %s\n", err)
@@ -90,7 +92,7 @@ func logoutHandler(rw http.ResponseWriter, req *http.Request) {
 }
 
 func adminHandler(rw http.ResponseWriter, req *http.Request) {
-	rndr.HTML(rw, http.StatusOK, "admin", nil)
+	rndr.HTML(rw, http.StatusOK, "admin", blog)
 }
 
 func newPostHandler(rw http.ResponseWriter, req *http.Request) {
