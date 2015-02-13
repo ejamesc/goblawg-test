@@ -24,8 +24,8 @@ var rndr = render.New(render.Options{
 	Layout:     "base",
 	Funcs: []template.FuncMap{
 		template.FuncMap{
-			"fdate":       dateFmt,
-			"sortedPosts": goblawg.SortPosts,
+			"fdate":     dateFmt,
+			"sortPosts": goblawg.SortPosts,
 		},
 	},
 })
@@ -59,7 +59,7 @@ func main() {
 			negroni.Wrap(adminBase),
 		))
 	admin := adminBase.PathPrefix("/admin").Subrouter()
-	admin.HandleFunc("/new-post", newPostHandler)
+	admin.HandleFunc("/new", newPostHandler)
 
 	/* Global Routes */
 	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/",

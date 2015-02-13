@@ -4,22 +4,23 @@
     <div class='header-actions'>
       <a href="#"><img data-tooltip arai-haspopup='true' class='has-tip' title="Regenerate the entire blog" src='/static/images/regen.png' alt='regen' /></a>
       <a href="#"><img data-tooltip arai-haspopup='true' class='has-tip' title="Settings" src='/static/images/settings.png' alt='settings' /></a>
-      <a href="#"><img data-tooltip arai-haspopup='true' class='has-tip' title="Logout" src='/static/images/logout.png' alt='logout' /></a>
+        <a href="#" onclick="$('#logout').submit()"><img data-tooltip arai-haspopup='true' class='has-tip' title="Logout" src='/static/images/logout.png' alt='logout' /></a>
+      <form role='form' id='logout' action='/logout' method='post'></form>
     </div>
   </header>
 </div>
 <div class='row'>
   <div class='small-12 columns'>
     <div class='blog-actions'>
-      <a href='#' class='button tiny radius success'>New Post</a>
+      <a href='/admin/new' class='button tiny radius success'>New Post</a>
     </div>
   </div>
   <div class='small-12 columns posts-list'>
     <ul>
-      {{ range .Posts | sortedPosts }}
+      {{ range .Posts | sortPosts }}
       <li>
       <h4>{{ fdate .Time }}</h4>
-      <h3><a href='#'>{{ .Title }}</a></h3>
+      <h3><a href='/admin/edit/{{ .Link }}'>{{ .Title }}</a></h3>
       <div class="post-actions">
         {{ if .IsDraft }}<span class="label secondary round">Draft</span>{{ end }}
         <a href="{{ .Link }}">view</a>

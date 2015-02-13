@@ -37,6 +37,7 @@ header h1 {
   cursor: pointer;
   border: none;
 }
+
 .header-actions img:hover {
   opacity: 1.0; 
   border: none;
@@ -44,6 +45,10 @@ header h1 {
 
 .header-actions a {
   text-decoration: none;
+}
+
+.header-actions form {
+  margin: 0;
 }
 
 .blog-actions {
