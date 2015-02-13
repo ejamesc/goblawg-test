@@ -193,6 +193,13 @@ func (b *Blog) GenerateSitePages() error {
 	return nil
 }
 
+// For templating
+// Sort posts in reverse chronological order
+func SortPosts(posts []*Post) []*Post {
+	sort.Sort(sort.Reverse(ByTime(posts)))
+	return posts
+}
+
 // Helpers
 func loadPostsFromDir(dir string) ([]*Post, error) {
 	listFileInfo, err := ioutil.ReadDir(dir)

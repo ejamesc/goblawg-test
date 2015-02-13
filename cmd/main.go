@@ -2,8 +2,10 @@ package main
 
 import (
 	"fmt"
+	"html/template"
 	"io/ioutil"
 	"net/http"
+	"time"
 
 	"github.com/codegangsta/negroni"
 	"github.com/ejamesc/goblawg"
@@ -20,6 +22,12 @@ var rndr = render.New(render.Options{
 	Directory:  "templates",
 	Extensions: []string{".html"},
 	Layout:     "base",
+	Funcs: []template.FuncMap{
+		template.FuncMap{
+			"fdate":       dateFmt,
+			"sortedPosts": goblawg.SortPosts,
+		},
+	},
 })
 
 var blog *goblawg.Blog
@@ -147,4 +155,11 @@ func standardMiddleware() *negroni.Negroni {
 	return negroni.New(
 		negroni.NewRecovery(),
 		negroni.NewLogger())
+}
+
+/* Template functions */
+
+func dateFmt(tt time.Time) string {
+	const layout = "3:04pm, 2 January 2006"
+	return tt.Format(layout)
 }

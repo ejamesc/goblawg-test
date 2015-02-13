@@ -16,9 +16,9 @@
   </div>
   <div class='small-12 columns posts-list'>
     <ul>
-      {{ range .Posts }}
+      {{ range .Posts | sortedPosts }}
       <li>
-      <h4>{{ .Time }}</h4>
+      <h4>{{ fdate .Time }}</h4>
       <h3><a href='#'>{{ .Title }}</a></h3>
       <div class="post-actions">
         {{ if .IsDraft }}<span class="label secondary round">Draft</span>{{ end }}
