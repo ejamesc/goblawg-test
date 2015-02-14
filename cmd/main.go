@@ -66,7 +66,8 @@ func main() {
 		http.FileServer(http.Dir("static"))))
 
 	// r.Handle("/", http.FileServer(http.Dir(blog.OutDir)))
-	r.HandleFunc("/login", loginHandler).Methods("GET", "POST")
+	r.HandleFunc("/login", loginDisplayHandler).Methods("GET")
+	r.HandleFunc("/login", loginHandler).Methods("POST")
 	r.HandleFunc("/logout", logoutHandler).Methods("POST")
 
 	n := standardMiddleware()
@@ -74,24 +75,24 @@ func main() {
 	n.Run(":3000")
 }
 
-func loginHandler(rw http.ResponseWriter, req *http.Request) {
-	if req.Method == "GET" {
-		if getUserName(req) == "ejames" {
-			http.Redirect(rw, req, "/admin", 302)
-			return
-		}
+func loginDisplayHandler(rw http.ResponseWriter, req *http.Request) {
+	if getUserName(req) == "ejames" {
+		http.Redirect(rw, req, "/admin", 302)
+	} else {
 		rndr.HTML(rw, http.StatusOK, "login", nil)
-	} else { // POST
-		name := req.FormValue("name")
-		pass := req.FormValue("password")
-		redirectTarget := "/login"
-		// Just a test
-		if name == "ejames" && pass == "temporary" {
-			setSession(name, rw)
-			redirectTarget = "/admin"
-		}
-		http.Redirect(rw, req, redirectTarget, 302)
 	}
+}
+
+func loginHandler(rw http.ResponseWriter, req *http.Request) {
+	name := req.FormValue("name")
+	pass := req.FormValue("password")
+	redirectTarget := "/login"
+	// Just a test
+	if name == "ejames" && pass == "temporary" {
+		setSession(name, rw)
+		redirectTarget = "/admin"
+	}
+	http.Redirect(rw, req, redirectTarget, 302)
 }
 
 func logoutHandler(rw http.ResponseWriter, req *http.Request) {
