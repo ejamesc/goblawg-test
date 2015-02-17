@@ -97,7 +97,7 @@ func loginHandler(rw http.ResponseWriter, req *http.Request) {
 
 func logoutHandler(rw http.ResponseWriter, req *http.Request) {
 	clearSession(rw)
-	http.Redirect(rw, req, "/admin/", 302)
+	http.Redirect(rw, req, "/login/", 302)
 }
 
 func adminHandler(rw http.ResponseWriter, req *http.Request) {
@@ -105,6 +105,27 @@ func adminHandler(rw http.ResponseWriter, req *http.Request) {
 }
 
 func newPostHandler(rw http.ResponseWriter, req *http.Request) {
+	post := &goblawg.Post{}
+	post.Body = []byte(req.FormValue("body"))
+	post.Title = req.FormValue("title")
+	link := ""
+	if req.FormValue("link") != "" {
+		link = req.FormValue("link")
+	} else {
+		link = goblawg.LinkifyTitle(post.Title)
+	}
+	post.Link = link
+
+	isDraft := false
+	if req.FormValue("draft") == "true" {
+		isDraft = true
+	}
+	post.IsDraft = isDraft
+
+	post.LastModified = time.Now()
+
+	blog.SavePost(post)
+
 	fmt.Fprintln(rw, "NEW POST")
 }
 

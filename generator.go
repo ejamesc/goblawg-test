@@ -158,6 +158,12 @@ func NewPostFromFile(path string, fi os.FileInfo) (*Post, error) {
 	return p, nil
 }
 
+func LinkifyTitle(title string) string {
+	link := strings.Replace(title, " ", "-", -1)
+	link = strings.ToLower(link)
+	return link
+}
+
 // Helper Functions
 
 func isMarkdownFile(n string) bool {
