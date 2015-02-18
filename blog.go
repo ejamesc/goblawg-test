@@ -193,6 +193,16 @@ func (b *Blog) GenerateSitePages() error {
 	return nil
 }
 
+func (b *Blog) GetPostByLink(link string) *Post {
+	for _, p := range b.Posts {
+		if p.Link == link {
+			return p
+		}
+	}
+
+	return nil
+}
+
 // For templating
 // Sort posts in reverse chronological order
 func SortPosts(posts []*Post) []*Post {

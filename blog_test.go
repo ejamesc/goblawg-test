@@ -171,3 +171,12 @@ func testGeneratingSitePages(t *testing.T) {
 	assert(t, err == nil, "Error with generation of about/index.html: %s", err)
 	assert(t, fi.IsDir() == true, "Expected about/ to be a folder, but got a file.")
 }
+
+func testGetPostByLink(t *testing.T) {
+	b, _ := goblawg.NewBlog(settingsJSON)
+	b.Posts = postFixtures
+
+	postUnderTest := b.GetPostByLink("it-was-a-riot")
+	assert(t, postUnderTest != nil, "Post not retrieved successfully")
+	assert(t, postUnderTest.Title == "It Was A Riot", "Wrong post was retrieved")
+}

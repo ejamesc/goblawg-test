@@ -122,6 +122,8 @@ func newPostHandler(rw http.ResponseWriter, req *http.Request) {
 	}
 	post.IsDraft = isDraft
 
+	// post.Time still hasn't been recorded
+
 	post.LastModified = time.Now()
 
 	blog.SavePost(post)
