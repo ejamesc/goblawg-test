@@ -127,7 +127,8 @@ func newPostHandler(rw http.ResponseWriter, req *http.Request) {
 	}
 	post.IsDraft = isDraft
 
-	// post.Time still hasn't been recorded
+	// Change this later
+	post.Time = time.Now()
 
 	post.LastModified = time.Now()
 
