@@ -59,7 +59,8 @@ func main() {
 			negroni.Wrap(adminBase),
 		))
 	admin := adminBase.PathPrefix("/admin").Subrouter()
-	admin.HandleFunc("/new", newPostHandler)
+	admin.HandleFunc("/new", newPostDisplayHandler).Methods("GET")
+	admin.HandleFunc("/new", newPostHandler).Methods("POST")
 
 	/* Global Routes */
 	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/",
@@ -104,6 +105,10 @@ func adminHandler(rw http.ResponseWriter, req *http.Request) {
 	rndr.HTML(rw, http.StatusOK, "admin", blog)
 }
 
+func newPostDisplayHandler(rw http.ResponseWriter, req *http.Request) {
+	rndr.HTML(rw, http.StatusOK, "newpost", blog)
+}
+
 func newPostHandler(rw http.ResponseWriter, req *http.Request) {
 	post := &goblawg.Post{}
 	post.Body = []byte(req.FormValue("body"))
@@ -126,7 +131,14 @@ func newPostHandler(rw http.ResponseWriter, req *http.Request) {
 
 	post.LastModified = time.Now()
 
-	blog.SavePost(post)
+	err := blog.SavePost(post)
+	// Change to session to display error.
+	if err != nil {
+		fmt.Fprintln(rw, "Post save error, %v", err)
+	}
+
+	fmt.Fprintln(rw, "New post successfully created")
+}
 
 	fmt.Fprintln(rw, "NEW POST")
 }

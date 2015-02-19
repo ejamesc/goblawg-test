@@ -1,37 +1,32 @@
-{{ template "adminheader" }}
-
-
-
-<div class="features">
-<h2>Admin</h2>
-<form action="/admin/save" method="POST">
-  <p>Here be a form to edit blog posts with.</p>
-  <input name="Title" type="text" placeholder="Title" />
-    <section class="editor">
-      <div class="outer">
-        <div class="editorwrap">
-          <section class="entry-markdown">
-            <header class="floatingheader">
-              &nbsp;&nbsp; Markdown 
-            </header>
-            <section class="entry-markdown-content">
-              <textarea name="Body" id="entry-markdown">Start writing a post.</textarea>
-            </section>
-          </section>
-          <section class="entry-preview active">
-            <header class="floatingheader">
-              &nbsp;&nbsp; Preview <span class="entry-word-count">0 words</span>
-            </header>
-            <section class="entry-preview-content">
-              <div class="rendered-markdown"></div>
-            </section>
-          </section>
-        </div>
+ <div class='row' style="width: 100%">
+      <header class='small-12 columns'>
+        <h1>goblawg &middot; <a href="{{ .Link }}">{{ .Name }}</a></h1>
+    <div class='header-actions'>
+      <a href="#"><img data-tooltip arai-haspopup='true' class='has-tip' title="Regenerate the entire blog" src='/static/images/regen.png' alt='regen' /></a>
+      <a href="#"><img data-tooltip arai-haspopup='true' class='has-tip' title="Settings" src='/static/images/settings.png' alt='settings' /></a>
+        <a href="#" onclick="$('#logout').submit()"><img data-tooltip arai-haspopup='true' class='has-tip' title="Logout" src='/static/images/logout.png' alt='logout' /></a>
+      <form role='form' id='logout' action='/logout' method='post'></form>
+    </div>      </header>
+    </div>
+    <div class='row'>
+      <div class="small-12 columns">
+        <input class='title-input' type='text' placeholder='Title' name='Title' value='' />
       </div>
-      <input type="submit" class="button" value="Submit"/>
-    </section>
-  </form>
+    </div>
+    <div class='row'>
+       <div class='small-12 columns editor-container'>
+          <textarea class='editor'></textarea>
+       </div>
+          <div class='small-12 medium-6 columns'>
+            <input class="button success" type="submit" value="Publish" />
+          </div>
+          <div class='small-12 medium-6 columns text-right save-details'>
+            <a href="#">Save</a> - <em>Last saved at 9:35 pm, 9 November 2014</em> 
+          </div>
+    </div>
+    <div class="row">
+      <footer class='small-12 columns text-center'>
+        Powered by goblawg.
+      </footer>
+    </div>
 
-  </div>
-
-  {{ template "adminfooter" }}
