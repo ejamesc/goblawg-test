@@ -61,6 +61,10 @@ func NewBlog(settingsJSON string) (*Blog, error) {
 
 // Save a blog post and write to disk
 func (b *Blog) SavePost(post *Post) error {
+	if tp := b.GetPostByLink(post.Link); tp != nil {
+		return fmt.Errorf("An existing post already has that link!")
+	}
+
 	title := strings.Replace(post.Title, " ", "-", -1)
 	title = strings.ToLower(title)
 	timeString := post.Time.Format(layout)
