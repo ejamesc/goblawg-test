@@ -80,7 +80,7 @@ func loginDisplayHandler(rw http.ResponseWriter, req *http.Request) {
 	if getUserName(req) == "ejames" {
 		http.Redirect(rw, req, "/admin", 302)
 	} else {
-		rndr.HTML(rw, http.StatusOK, "login", nil)
+		rndr.HTML(rw, http.StatusOK, "login", blog)
 	}
 }
 
@@ -98,7 +98,7 @@ func loginHandler(rw http.ResponseWriter, req *http.Request) {
 
 func logoutHandler(rw http.ResponseWriter, req *http.Request) {
 	clearSession(rw)
-	http.Redirect(rw, req, "/login/", 302)
+	http.Redirect(rw, req, "/login", 302)
 }
 
 func adminHandler(rw http.ResponseWriter, req *http.Request) {
