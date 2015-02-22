@@ -74,7 +74,7 @@ func (b *Blog) SavePost(post *Post) error {
 		filename = "_" + filename
 	}
 
-	filepath := path.Join(b.OutDir, filename)
+	filepath := path.Join(b.InDir, "posts", filename)
 	err := ioutil.WriteFile(filepath, post.Body, 0776)
 	if err != nil {
 		return err
