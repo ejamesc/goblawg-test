@@ -65,14 +65,7 @@ func (b *Blog) SavePost(post *Post) error {
 		return fmt.Errorf("An existing post already has that link!")
 	}
 
-	title := strings.Replace(post.Title, " ", "-", -1)
-	title = strings.ToLower(title)
-	timeString := post.Time.Format(layout)
-	filename := timeString + "-" + title + ".md"
-
-	if post.IsDraft {
-		filename = "_" + filename
-	}
+	filename := constructFilename(post)
 
 	// Create posts directory if not exists
 	postsDir := path.Join(b.InDir, "posts")
@@ -81,13 +74,35 @@ func (b *Blog) SavePost(post *Post) error {
 		os.Mkdir(postsDir, 0775)
 	}
 
-	filepath := path.Join(b.InDir, "posts", filename)
+	filepath := path.Join(postsDir, filename)
 	err = ioutil.WriteFile(filepath, post.Body, 0776)
 	if err != nil {
 		return err
 	}
 
 	b.Posts = append(b.Posts, post)
+	return nil
+}
+
+func (b *Blog) DeletePost(p *Post) error {
+	deleted := false
+	for i, post := range b.Posts {
+		if post.Link == p.Link {
+			b.Posts = b.Posts[:i+copy(b.Posts[i:], b.Posts[i+1:])]
+			deleted = true
+			break
+		}
+	}
+	if !deleted {
+		return fmt.Errorf("Post does not exist")
+	}
+
+	path := path.Join(b.InDir, "posts", constructFilename(p))
+	err := os.Remove(path)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -248,4 +263,17 @@ func loadPostsFromDir(dir string) ([]*Post, error) {
 	}
 
 	return posts, nil
+}
+
+func constructFilename(post *Post) string {
+	title := strings.Replace(post.Title, " ", "-", -1)
+	title = strings.ToLower(title)
+	timeString := post.Time.Format(layout)
+	filename := timeString + "-" + title + ".md"
+
+	if post.IsDraft {
+		filename = "_" + filename
+	}
+
+	return filename
 }

@@ -48,7 +48,7 @@ func TestNewBlog(t *testing.T) {
 }
 
 // Test saving posts
-func TestSavePost(t *testing.T) {
+func TestSaveAndDeletePost(t *testing.T) {
 	//Setup
 	dir := os.TempDir()
 	testPath, fi := setup(dir, "")
@@ -58,7 +58,7 @@ func TestSavePost(t *testing.T) {
 	currTime := time.Now()
 
 	post1, _ := goblawg.NewPostFromFile(testPath, fi)
-	post2 := &goblawg.Post{"The Shining", []byte("<p>Hello world, this is my first post</p>\n"), "the-shining", tts, true, currTime}
+	post2 := &goblawg.Post{"The Shining", []byte("Hello world, this is my first post"), "the-shining", tts, true, currTime}
 
 	postListBefore := []*goblawg.Post{post1}
 	postListAfter := []*goblawg.Post{post1, post2}
@@ -86,6 +86,24 @@ func TestSavePost(t *testing.T) {
 	// Stub out the LastModified
 	postUnderTest.LastModified = currTime
 	equals(t, post2, postUnderTest)
+
+	// Test the deletion
+	err = b.DeletePost(post2)
+
+	ok(t, err)
+	assert(t, len(b.Posts) == 1, "Post not deleted from b.Posts")
+	fList, _ := ioutil.ReadDir(postPath)
+	fileDeleted := true
+	for _, fi := range fList {
+		if fi.Name() == "_21-Oct-2013-14-06-10-the-shining.md" {
+			fileDeleted = false
+		}
+	}
+	assert(t, fileDeleted == true, "Post not deleted from file system")
+
+	// Test deletion error works
+	err = b.DeletePost(post2)
+	assert(t, err != nil, "Expecting error to be returned when deleting non-existent post")
 }
 
 // Test Generate HTML
