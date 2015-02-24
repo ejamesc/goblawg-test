@@ -74,8 +74,15 @@ func (b *Blog) SavePost(post *Post) error {
 		filename = "_" + filename
 	}
 
+	// Create posts directory if not exists
+	postsDir := path.Join(b.InDir, "posts")
+	_, err := ioutil.ReadDir(postsDir)
+	if err != nil {
+		os.Mkdir(postsDir, 0775)
+	}
+
 	filepath := path.Join(b.InDir, "posts", filename)
-	err := ioutil.WriteFile(filepath, post.Body, 0776)
+	err = ioutil.WriteFile(filepath, post.Body, 0776)
 	if err != nil {
 		return err
 	}

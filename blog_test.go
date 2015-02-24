@@ -63,19 +63,20 @@ func TestSavePost(t *testing.T) {
 	postListBefore := []*goblawg.Post{post1}
 	postListAfter := []*goblawg.Post{post1, post2}
 
-	b := &goblawg.Blog{Posts: postListBefore, OutDir: dir}
+	b := &goblawg.Blog{Posts: postListBefore, InDir: dir}
 	err := b.SavePost(post2)
 
 	ok(t, err)
 	equals(t, b.Posts, postListAfter)
 
-	fileInfoList, _ := ioutil.ReadDir(dir)
+	postPath := path.Join(dir, "posts")
+	fileInfoList, _ := ioutil.ReadDir(postPath)
 	fileGenerated := false
 	var postUnderTest *goblawg.Post
 	for _, fi := range fileInfoList {
 		if fi.Name() == "_21-Oct-2013-14-06-10-the-shining.md" {
 			fileGenerated = true
-			filePath := path.Join(dir, fi.Name())
+			filePath := path.Join(postPath, fi.Name())
 			postUnderTest, _ = goblawg.NewPostFromFile(filePath, fi)
 			defer teardown(filePath)
 		}
