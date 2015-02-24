@@ -64,6 +64,8 @@ func main() {
 	admin.HandleFunc("/new", newPostDisplayHandler).Methods("GET")
 	admin.HandleFunc("/new", newPostHandler).Methods("POST")
 	admin.HandleFunc("/edit/{link}", editPostDisplayHandler).Methods("GET")
+	admin.HandleFunc("/edit/{link}", editPostHandler).Methods("POST")
+	admin.HandleFunc("/delete/{link}", deletePostHandler).Methods("DELETE")
 
 	/* Global Routes */
 	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/",
@@ -148,7 +150,6 @@ func editPostDisplayHandler(rw http.ResponseWriter, req *http.Request) {
 	vars := mux.Vars(req)
 	link := vars["link"]
 	post := blog.GetPostByLink(link)
-	fmt.Println(string(post.Body))
 
 	presenter := struct {
 		Name         string
@@ -174,7 +175,24 @@ func editPostDisplayHandler(rw http.ResponseWriter, req *http.Request) {
 }
 
 func editPostHandler(rw http.ResponseWriter, req *http.Request) {
+	vars := mux.Vars(req)
+	link := vars["link"]
+	post := blog.GetPostByLink(link)
 
+	fmt.Println(post)
+}
+
+func deletePostHandler(rw http.ResponseWriter, req *http.Request) {
+	link := mux.Vars(req)["link"]
+	post := blog.GetPostByLink(link)
+	err := blog.DeletePost(post)
+
+	if err != nil {
+		// TODO: change to sessions flash.
+		fmt.Fprintf(rw, "Error: %v", err)
+		return
+	}
+	http.Redirect(rw, req, "/admin", 302)
 }
 
 func authMiddleware(rw http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
