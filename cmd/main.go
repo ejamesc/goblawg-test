@@ -11,6 +11,7 @@ import (
 	"github.com/ejamesc/goblawg"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/securecookie"
+	"github.com/russross/blackfriday"
 	"github.com/unrolled/render"
 )
 
@@ -25,6 +26,7 @@ var rndr = render.New(render.Options{
 	Funcs: []template.FuncMap{
 		template.FuncMap{
 			"fdate":     dateFmt,
+			"md":        markdown,
 			"sortPosts": goblawg.SortPosts,
 		},
 	},
@@ -230,4 +232,9 @@ func standardMiddleware() *negroni.Negroni {
 func dateFmt(tt time.Time) string {
 	const layout = "3:04pm, 2 January 2006"
 	return tt.Format(layout)
+}
+
+func markdown(input []byte) string {
+	output := blackfriday.MarkdownCommon(input)
+	return string(output)
 }
