@@ -61,6 +61,7 @@ func main() {
 	admin := adminBase.PathPrefix("/admin").Subrouter()
 	admin.HandleFunc("/new", newPostDisplayHandler).Methods("GET")
 	admin.HandleFunc("/new", newPostHandler).Methods("POST")
+	admin.HandleFunc("/edit/{link}", editPostDisplayHandler).Methods("GET")
 
 	/* Global Routes */
 	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/",
@@ -141,7 +142,37 @@ func newPostHandler(rw http.ResponseWriter, req *http.Request) {
 	fmt.Fprintln(rw, "New post successfully created")
 }
 
-	fmt.Fprintln(rw, "NEW POST")
+func editPostDisplayHandler(rw http.ResponseWriter, req *http.Request) {
+	vars := mux.Vars(req)
+	link := vars["link"]
+	post := blog.GetPostByLink(link)
+	fmt.Println(string(post.Body))
+
+	presenter := struct {
+		Name         string
+		BlogLink     string
+		Title        string
+		Body         string
+		Link         string
+		Time         time.Time
+		IsDraft      bool
+		LastModified time.Time
+	}{
+		blog.Name,
+		blog.Link,
+		post.Title,
+		string(post.Body),
+		post.Link,
+		post.Time,
+		post.IsDraft,
+		post.LastModified,
+	}
+
+	rndr.HTML(rw, http.StatusOK, "edit", presenter)
+}
+
+func editPostHandler(rw http.ResponseWriter, req *http.Request) {
+
 }
 
 func authMiddleware(rw http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
