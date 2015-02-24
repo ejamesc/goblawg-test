@@ -9,8 +9,6 @@ import (
 	"regexp"
 	"strings"
 	"time"
-
-	"github.com/russross/blackfriday"
 )
 
 var r = regexp.MustCompile(`(_*)(\d{1,2}-[a-zA-Z]{3}-\d{4}-\d{1,2}-\d{1,2}-\d{1,2})-(.+)`)
@@ -152,7 +150,6 @@ func NewPostFromFile(path string, fi os.FileInfo) (*Post, error) {
 		return nil, err
 	}
 
-	body = blackfriday.MarkdownCommon(body)
 	p.Body = body
 
 	return p, nil

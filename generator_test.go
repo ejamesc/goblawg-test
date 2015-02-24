@@ -54,7 +54,7 @@ func TestNewPostFromFile(t *testing.T) {
 
 	tts, _ := time.Parse(layout, "2-Oct-2014-15-04-06")
 
-	expected := &goblawg.Post{"It Was A Riot", []byte("<p>Hello world, this is my first post</p>\n"), "it-was-a-riot", tts, false, fi.ModTime()}
+	expected := &goblawg.Post{"It Was A Riot", []byte("Hello world, this is my first post"), "it-was-a-riot", tts, false, fi.ModTime()}
 	equals(t, expected, p)
 	equals(t, "2 Oct 2014, 15:04:06", p.Time.Format(layout2))
 }
