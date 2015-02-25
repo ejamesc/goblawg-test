@@ -17,7 +17,7 @@
   </div>
   <div class='small-12 columns posts-list'>
     <ul>
-      {{ range .Posts | sortPosts }}
+      {{ range .Posts }}
       <li>
       <h4>{{ fdate .Time }}</h4>
       <h3><a href='/admin/edit/{{ .Link }}'>{{ .Title }}</a></h3>

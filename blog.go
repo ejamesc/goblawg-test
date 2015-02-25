@@ -124,6 +124,13 @@ func (b *Blog) GetPublishedPosts() []*Post {
 	return ps
 }
 
+// Return all posts, sorted in reverse chronological order
+func (b *Blog) GetAllPosts() []*Post {
+	ps := b.Posts
+	sort.Sort(sort.Reverse(ByTime(ps)))
+	return ps
+}
+
 // Generate the entire blog
 // TODO: Put all generation in go routines
 func (b *Blog) GenerateSite() error {
@@ -227,13 +234,6 @@ func (b *Blog) GetPostByLink(link string) *Post {
 	}
 
 	return nil
-}
-
-// For templating
-// Sort posts in reverse chronological order
-func SortPosts(posts []*Post) []*Post {
-	sort.Sort(sort.Reverse(ByTime(posts)))
-	return posts
 }
 
 // Helpers

@@ -25,9 +25,8 @@ var rndr = render.New(render.Options{
 	Layout:     "base",
 	Funcs: []template.FuncMap{
 		template.FuncMap{
-			"fdate":     dateFmt,
-			"md":        markdown,
-			"sortPosts": goblawg.SortPosts,
+			"fdate": dateFmt,
+			"md":    markdown,
 		},
 	},
 })
@@ -107,7 +106,28 @@ func logoutHandler(rw http.ResponseWriter, req *http.Request) {
 }
 
 func adminHandler(rw http.ResponseWriter, req *http.Request) {
-	rndr.HTML(rw, http.StatusOK, "admin", blog)
+	presenter := struct {
+		Name         string
+		Link         string
+		Description  string
+		Author       string
+		Email        string
+		Posts        []*goblawg.Post
+		InDir        string
+		OutDir       string
+		LastModified time.Time
+	}{
+		blog.Name,
+		blog.Link,
+		blog.Description,
+		blog.Author,
+		blog.Email,
+		blog.GetAllPosts(),
+		blog.InDir,
+		blog.OutDir,
+		blog.LastModified,
+	}
+	rndr.HTML(rw, http.StatusOK, "admin", presenter)
 }
 
 func newPostDisplayHandler(rw http.ResponseWriter, req *http.Request) {
