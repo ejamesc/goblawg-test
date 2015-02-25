@@ -12,15 +12,15 @@
 <form role='form' action='/admin/new' method='post'>
 <div class='row'>
   <div class="small-12 columns">
-    <input class='title-input large-12.columns' type='text' placeholder='Title' name='Title' value='{{ .Title }}' />
+    <input class='title-input large-12.columns' type='text' name='title' value='{{ .Title }}' />
   </div>
 </div>
 <div class='row'>
   <div class='small-12 columns editor-container'>
-    <textarea class='editor'>{{ .Body }}</textarea>
+    <textarea name='body' class='editor'>{{ .Body }}</textarea>
   </div>
   <div class='small-12 medium-6 columns'>
-    <input class="button success" type="submit" value="Publish" />
+    <input class="button success" type="submit" value="Done" />
   </div>
   <div class='small-12 medium-6 columns text-right save-details'>
     <a href="#">Save</a> - <em>Last saved at {{ .LastModified | fdate }}</em> <br/>
@@ -31,7 +31,7 @@
         <label for="right-label" class="right">Timestamp:</label>
       </div>
       <div class="small-5 columns">
-        <input type="text" id="right-label" placeholder="2:30pm, 10 September 2014" value="2:30pm, 10 September 2014">
+        <input type="text" id="right-label" value="{{ .Time | fdate }}">
       </div>
     </div>
   </div>
@@ -42,6 +42,11 @@
     Powered by goblawg.
   </footer>
 </div>
-
-
+<script>
+$(document).foundation({
+tooltip: {
+disable_for_touch: true,
+}
+});
+</script>
 

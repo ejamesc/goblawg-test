@@ -138,13 +138,7 @@ func newPostHandler(rw http.ResponseWriter, req *http.Request) {
 	post := &goblawg.Post{}
 	post.Body = []byte(req.FormValue("body"))
 	post.Title = req.FormValue("title")
-	link := ""
-	if req.FormValue("link") != "" {
-		link = req.FormValue("link")
-	} else {
-		link = goblawg.LinkifyTitle(post.Title)
-	}
-	post.Link = link
+	post.Link = goblawg.LinkifyTitle(post.Title)
 
 	isDraft := false
 	if req.FormValue("draft") == "true" {
@@ -163,7 +157,7 @@ func newPostHandler(rw http.ResponseWriter, req *http.Request) {
 		fmt.Fprintln(rw, "Post save error, %v", err)
 	}
 
-	fmt.Fprintln(rw, "New post successfully created")
+	http.Redirect(rw, req, "/admin", 302)
 }
 
 func editPostDisplayHandler(rw http.ResponseWriter, req *http.Request) {
