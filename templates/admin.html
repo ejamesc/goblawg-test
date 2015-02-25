@@ -23,8 +23,8 @@
       <h3><a href='/admin/edit/{{ .Link }}'>{{ .Title }}</a></h3>
       <div class="post-actions">
         {{ if .IsDraft }}<span class="label secondary round">Draft</span>{{ end }}
-        <a href="{{ .Link }}">view</a>
-        <a href='#'>delete</a>
+        <a href="/{{ .Link }}">view</a>
+        <a onclick='deletePost("/admin/delete/{{ .Link }}")' href='#'>delete</a>
       </div>
       </li>
       {{ end }}
@@ -42,5 +42,15 @@ tooltip: {
 disable_for_touch: true,
 }
 });
+function deletePost(delURL) {
+  var r = confirm("Are you sure you want to delete that?");
+  if (r == true) {
+    $.ajax({
+    url: delURL, 
+    type: "DELETE", 
+    success: function(){location.reload();}
+  });
+  }
+}
 </script>
 

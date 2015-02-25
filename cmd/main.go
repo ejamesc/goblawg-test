@@ -138,7 +138,7 @@ func newPostHandler(rw http.ResponseWriter, req *http.Request) {
 	post.LastModified = time.Now()
 
 	err := blog.SavePost(post)
-	// Change to session to display error.
+	// TODO: Change to session to display error.
 	if err != nil {
 		fmt.Fprintln(rw, "Post save error, %v", err)
 	}
@@ -182,17 +182,13 @@ func editPostHandler(rw http.ResponseWriter, req *http.Request) {
 	fmt.Println(post)
 }
 
+// Delete post endpoint
 func deletePostHandler(rw http.ResponseWriter, req *http.Request) {
 	link := mux.Vars(req)["link"]
 	post := blog.GetPostByLink(link)
-	err := blog.DeletePost(post)
+	blog.DeletePost(post)
 
-	if err != nil {
-		// TODO: change to sessions flash.
-		fmt.Fprintf(rw, "Error: %v", err)
-		return
-	}
-	http.Redirect(rw, req, "/admin", 302)
+	rndr.JSON(rw, http.StatusNoContent, nil)
 }
 
 func authMiddleware(rw http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
