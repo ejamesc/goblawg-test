@@ -65,6 +65,7 @@ func main() {
 	admin.HandleFunc("/edit/{link}", editPostDisplayHandler).Methods("GET")
 	admin.HandleFunc("/edit/{link}", editPostHandler).Methods("POST")
 	admin.HandleFunc("/delete/{link}", deletePostHandler).Methods("DELETE")
+	admin.HandleFunc("/regen", regenerateSiteHandler).Methods("POST")
 
 	/* Global Routes */
 	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/",
@@ -106,27 +107,8 @@ func logoutHandler(rw http.ResponseWriter, req *http.Request) {
 }
 
 func adminHandler(rw http.ResponseWriter, req *http.Request) {
-	presenter := struct {
-		Name         string
-		Link         string
-		Description  string
-		Author       string
-		Email        string
-		Posts        []*goblawg.Post
-		InDir        string
-		OutDir       string
-		LastModified time.Time
-	}{
-		blog.Name,
-		blog.Link,
-		blog.Description,
-		blog.Author,
-		blog.Email,
-		blog.GetAllPosts(),
-		blog.InDir,
-		blog.OutDir,
-		blog.LastModified,
-	}
+	presenter := *blog
+	presenter.Posts = blog.GetAllPosts()
 	rndr.HTML(rw, http.StatusOK, "admin", presenter)
 }
 
@@ -155,6 +137,7 @@ func newPostHandler(rw http.ResponseWriter, req *http.Request) {
 	// TODO: Change to session to display error.
 	if err != nil {
 		fmt.Fprintln(rw, "Post save error, %v", err)
+		return
 	}
 
 	http.Redirect(rw, req, "/admin", 302)
@@ -196,13 +179,23 @@ func editPostHandler(rw http.ResponseWriter, req *http.Request) {
 	fmt.Println(post)
 }
 
-// Delete post endpoint
 func deletePostHandler(rw http.ResponseWriter, req *http.Request) {
 	link := mux.Vars(req)["link"]
 	post := blog.GetPostByLink(link)
 	blog.DeletePost(post)
 
 	rndr.JSON(rw, http.StatusNoContent, nil)
+}
+
+func regenerateSiteHandler(rw http.ResponseWriter, req *http.Request) {
+	err := blog.GenerateSite()
+
+	if err != nil {
+		fmt.Fprintf(rw, "ERROR: %v", err)
+		return
+	}
+
+	fmt.Fprintf(rw, "Success!")
 }
 
 func authMiddleware(rw http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
